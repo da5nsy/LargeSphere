@@ -5,11 +5,12 @@
 %
 %-------------------------------------------------------------------------
 
-name = 'Danny';
+clear, clc, close all
+
+name = 'Lindsay';
 filter_lambda = 480;                  % filter wavelength
 
-rootdir = fullfile('C:','Users','ucesars','Dropbox','UCL','Data',Sphere);
-C:\Users\ucesars\Dropbox\UCL\Data\Sphere back up
+rootdir = fullfile('C:','Users','cege-user','Dropbox','UCL','Data','LargeSphere');
 
 if strcmp(name,'Lindsay');
   fname = sprintf('%dnm - time.mat',filter_lambda);
@@ -27,7 +28,7 @@ N = 10;                             % number of repetitions over time
 LN = 16;                            % number of lightness levels per repeat
 
 Lval = squeeze(LABmatch(1,:,1));    % L values
-dfile = fullfile(rootdir,'Filter Spectra','Large LCD display measurement.mat');
+dfile = fullfile(rootdir,'Large LCD display measurement.mat');
 load(dfile);                        % load display data
 
 %% Make mosaic of matching colours - lightness vs iteration
