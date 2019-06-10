@@ -6,13 +6,16 @@
 %
 %-------------------------------------------------------------------------
 
-dir = fullfile('C:','Research at UCL','Experiment','Tania  time series - Apr 2013');
+clear, clc, close all
+
+dir = 'C:\Users\cege-user\Dropbox\UCL\Data\LargeSphere\Experimental Data\Apr 2013';
 s1 = 341;               % number of values in 1nm spectrum 390-730 nm
 w1 = 390:1:730;
 s5 = 69;                % number of values in 5nm spectrum 390-730 nm
 w5 = 390:5:730;
-ciedir = fullfile('C:','Research at UCL','Colour standards','CIE colorimetric data');
-cvrldir = fullfile('C:','Research at UCL','Colour standards','CVRL cone fundamentals');
+
+ciedir = fullfile('C:\Users\cege-user\Dropbox\UCL\Data\Colour standards','CIE colorimetric data');
+cvrldir = fullfile('C:\Users\cege-user\Dropbox\UCL\Data\Colour standards','CVRL cone fundamentals');
 
 %% Read Stockman-Sharpe 10-deg cone fundamentals (390-730 nm in 1nm intervals)
 
@@ -60,7 +63,7 @@ Lval = squeeze(LABM(1,:,1,1));      % L values
 
 %% Read display data for primaries and luminance calibation
 
-dfile = fullfile('C:','Research at UCL','Experiment','Large LCD display measurement.mat');
+dfile = 'C:\Users\cege-user\Dropbox\UCL\Data\LargeSphere\Hardware Data\Calibration Data\Large LCD display measurement.mat';
 load(dfile);                        % load display data
 
 imax = 65535;                       % maximum integer in 16-bit range

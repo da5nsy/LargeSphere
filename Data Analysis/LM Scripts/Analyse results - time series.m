@@ -5,8 +5,10 @@
 %
 %-------------------------------------------------------------------------
 
+clear, clc, close all
+
 filter_lambda = 0;                       % filter wavelength
-dir = fullfile('C:','Research at UCL','Experiment','Tania  time series - Apr 2013');
+dir = 'C:\Users\cege-user\Dropbox\UCL\Data\LargeSphere\Experimental Data\Apr 2013';
 %fname = sprintf('%dnm - time v2.mat',filter_lambda);
 fname = 'ND8 - time.mat';
 load(fullfile(dir,fname));          % load experimental results for wavelength
@@ -15,7 +17,7 @@ N = 10;                             % number of repetitions over time
 LN = 16;                            % number of lightness levels per repeat
 
 Lval = squeeze(LABmatch(1,:,1));    % L values
-dfile = fullfile('C:','Research at UCL','Experiment','Large LCD display measurement.mat');
+dfile = 'C:\Users\cege-user\Dropbox\UCL\Data\LargeSphere\Hardware Data\Calibration Data\Large LCD display measurement.mat';
 load(dfile);                        % load display data
 
 %% Plot results as 3D surfaces
@@ -71,7 +73,7 @@ s = 4;                          % spacing between boxes
 w = s+N*(b+s);                  % width of array (iteration axis)
 h = s+LN*(b+s);                 % height of array (lightness axis)
 Im = zeros(h,w,3,'uint8');      % image array
-idir = fullfile('C:','Test','Experiment - Apr 2013');
+idir = 'C:\Users\cege-user\Dropbox\UCL\Data\LargeSphere\Experimental Data\Apr 2013';
 
 for n = 1:N
   xp = s+(n-1)*(b+s);                    % x pixel address (iteration axis)
