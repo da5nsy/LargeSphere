@@ -1,0 +1,29 @@
+Regretting having not started this earlier... Writing this on the 25/11/2016.
+Many of these points seem arbitrary now but perhaps they will be pertinent in the future analysis of this data.
+
+(Earlier points)
+A small number of times (<5) an error occured with the hardware (I think I accidentally touched the slider input cable, which is near the button) and in the course of correcting this 1, 2 or possibly 3 readings would be erroneous. I have tried to indicate exactly when this happened to whoever analyses this data in the future by leaving a pointer of 1 or more purposefully wildly out readings immediately after this might happen. (Example: I notice that the slider is not working, I fix it, I pull both of the sliders to their extremes and press the button once, and then continue as before).
+
+A small number of times it has not been possible to make the selections I wish to make (I have wanted to select a colour which was outside the bounds of selection on the sliders. This happened on 2 or 3 wavelength runs only, but perhaps 10-20 times on each of these wavelength runs.
+
+The highest luminance matches seem easy, and appear white.
+The middle luminances seem difficult, but I feel as though my precision is high here.
+The low luminances seem difficult, and I'm often not entirely happy with my chosen matches, though find it difficult to describe why. They do not seem of any particular colour, but nontheless do not appear achromatic(?).
+
+520nm
+
+Today feels like I'm filling in the gaps, the end is in sight(!). I'm selecting the wavelength above the already recorded ones (E.g. If I had already done 400, 500, 600, today I would do 420, 520, 620) so as to not focus too heavily on a specific section of the spectrum.
+First session of the day, after a fairly good nights sleep (but following 2 pints of beer)
+An early morning, a short bus ride followed by the tube, a walk from Tottenham Court Road to the basement, then the basement lab lights.
+Since my return from Chile, one piece of card covering a door window which looks onto the adjacent lab (lit) has been missing. This is regrettable but I think the impact should be limited. If I remove my head from the sphere during a session (to stretch generally) I keep my eyes tightly closed and turn away from said light source.
+I did not wear glasses.
+I listened (with noise cancelling headphones) to a podcast, and then (using 'OK Google' to navigate) to an audiobook.
+
+640nm
+
+After 520nm, I went to the library and read a paper (printed, under daylight through glass, I think it is overcast today), then returned to the basement, had a snack and visited the bathroom, and commenced.
+I did not wear glasses.
+I listed to a podcast and then to music (accidentally touching my phone triggered the switch).
+
+480_2
+After a morning meeting with Mona, looking at a laptop screen in a daylit room. About a third of the way through, the laptop slept and I had to plug it in- minimal disturbance to adaptation hopefully, but I recorded a couple of readings with the sliders both pulled close to me to indicate exactly when this happened.

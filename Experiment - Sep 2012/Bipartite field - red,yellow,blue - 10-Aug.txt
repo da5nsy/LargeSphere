@@ -1,0 +1,168 @@
+Colour matching values for bipartite field in sphere
+Observer: Lindsay MacDonald, 10-Aug-2012
+
+Lights: Red, yellow, blue
+Chroma slider range 0-120
+Grey 0.2 behind LED panel to reduce saturation of stimulus
+Viewing bipartite field through black tube to reduce light scatter.
+
+Filter wavelength = 400 nm
+1 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  white
+2 LHC = 34.80, 37.08,83.16  RGB_raw =  0.687,-0.134,-0.013  red
+3 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  orange
+4 LHC = 29.30, 57.96,42.72  RGB_raw =  0.430, 0.213, 0.019  yellow
+5 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  greenY
+6 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  greenB
+7 LHC = 21.70,302.04,75.48  RGB_raw =  0.150, 0.128, 0.556  blue
+8 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  magenta
+
+Filter wavelength = 420 nm
+1 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  white
+2 LHC = 31.50, 27.36,73.32  RGB_raw =  0.637,-0.167, 0.089  red
+3 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  orange
+4 LHC = 31.50, 51.48,36.60  RGB_raw =  0.450, 0.233, 0.101  yellow
+5 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  greenY
+6 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  greenB
+7 LHC = 29.90,305.28,119.88  RGB_raw =  0.200, 0.071, 0.855  blue
+8 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  magenta
+
+Filter wavelength = 440 nm
+1 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  white
+2 LHC = 36.70, 29.16,78.12  RGB_raw =  0.716,-0.128, 0.102  red
+3 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  orange
+4 LHC = 29.60, 52.92,37.92  RGB_raw =  0.431, 0.215, 0.074  yellow
+5 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  greenY
+6 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  greenB
+7 LHC = 25.90,306.00,110.04  RGB_raw =  0.200, 0.033, 0.755  blue
+8 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  magenta
+
+Filter wavelength = 460 nm
+1 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  white
+2 LHC = 37.50, 36.72,88.32  RGB_raw =  0.741,-0.179,-0.012  red
+3 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  orange
+4 LHC = 33.90, 51.84,42.12  RGB_raw =  0.494, 0.244, 0.089  yellow
+5 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  greenY
+6 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  greenB
+7 LHC = 28.20,304.20,107.40  RGB_raw =  0.181, 0.112, 0.778  blue
+8 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  magenta
+
+Filter wavelength = 480 nm
+1 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  white
+2 LHC = 39.00, 36.36,89.16  RGB_raw =  0.764,-0.168,-0.001  red
+3 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  orange
+4 LHC = 31.60, 51.48,39.12  RGB_raw =  0.459, 0.229, 0.088  yellow
+5 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  greenY
+6 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  greenB
+7 LHC = 28.00,304.20,106.80  RGB_raw =  0.180, 0.111, 0.773  blue
+8 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  magenta
+
+Filter wavelength = 500 nm
+1 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  white
+2 LHC = 35.20, 31.32,80.88  RGB_raw =  0.702,-0.186, 0.062  red
+3 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  orange
+4 LHC = 29.20, 60.48,44.64  RGB_raw =  0.427, 0.214,-0.004  yellow
+5 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  greenY
+6 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  greenB
+7 LHC = 26.30,304.92,104.52  RGB_raw =  0.188, 0.087, 0.738  blue
+8 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  magenta
+
+Filter wavelength = 520 nm
+1 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  white
+2 LHC = 39.80, 37.80,92.88  RGB_raw =  0.782,-0.192,-0.029  red
+3 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  orange
+4 LHC = 29.40, 51.12,36.60  RGB_raw =  0.428, 0.213, 0.085  yellow
+5 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  greenY
+6 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  greenB
+7 LHC = 26.60,304.56,103.08  RGB_raw =  0.187, 0.100, 0.736  blue
+8 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  magenta
+
+Filter wavelength = 540 nm
+1 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  white
+2 LHC = 37.40, 31.32,82.32  RGB_raw =  0.735,-0.166, 0.075  red
+3 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  orange
+4 LHC = 30.40, 52.92,39.48  RGB_raw =  0.444, 0.219, 0.071  yellow
+5 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  greenY
+6 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  greenB
+7 LHC = 26.10,303.84,96.48  RGB_raw =  0.182, 0.120, 0.701  blue
+8 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  magenta
+
+Filter wavelength = 560 nm
+1 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  white
+2 LHC = 38.20, 32.40,84.72  RGB_raw =  0.751,-0.179, 0.062  red
+3 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  orange
+4 LHC = 30.30, 54.72,41.40  RGB_raw =  0.445, 0.218, 0.052  yellow
+5 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  greenY
+6 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  greenB
+7 LHC = 26.00,305.28,105.96  RGB_raw =  0.191, 0.072, 0.740  blue
+8 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  magenta
+
+Filter wavelength = 580 nm
+1 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  white
+2 LHC = 34.50, 28.08,76.08  RGB_raw =  0.683,-0.152, 0.099  red
+3 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  orange
+4 LHC = 29.40, 55.44,40.44  RGB_raw =  0.431, 0.213, 0.047  yellow
+5 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  greenY
+6 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  greenB
+7 LHC = 27.00,305.64,109.92  RGB_raw =  0.206, 0.062, 0.769  blue
+8 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  magenta
+
+Filter wavelength = 600 nm
+1 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  white
+2 LHC = 36.00, 30.96,80.40  RGB_raw =  0.711,-0.164, 0.074  red
+3 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  orange
+4 LHC = 30.20, 56.88,44.28  RGB_raw =  0.447, 0.216, 0.020  yellow
+5 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  greenY
+6 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  greenB
+7 LHC = 24.30,306.00,109.80  RGB_raw =  0.171, 0.008, 0.737  blue
+8 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  magenta
+
+Filter wavelength = 620 nm
+1 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  white
+2 LHC = 36.80, 30.60,80.52  RGB_raw =  0.723,-0.154, 0.083  red
+3 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  orange
+4 LHC = 32.60, 52.92,42.48  RGB_raw =  0.478, 0.233, 0.072  yellow
+5 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  greenY
+6 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  greenB
+7 LHC = 24.90,306.36,117.60  RGB_raw =  0.161,-0.039, 0.780  blue
+8 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  magenta
+
+Filter wavelength = 640 nm
+1 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  white
+2 LHC = 36.30, 27.72,78.24  RGB_raw =  0.715,-0.163, 0.110  red
+3 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  orange
+4 LHC = 28.80, 58.32,41.52  RGB_raw =  0.420, 0.211, 0.022  yellow
+5 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  greenY
+6 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  greenB
+7 LHC = 25.90,305.64,109.56  RGB_raw =  0.188, 0.047, 0.755  blue
+8 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  magenta
+
+Filter wavelength = 660 nm
+1 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  white
+2 LHC = 34.10, 28.08,76.20  RGB_raw =  0.679,-0.163, 0.096  red
+3 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  orange
+4 LHC = 29.90, 54.72,42.24  RGB_raw =  0.443, 0.213, 0.042  yellow
+5 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  greenY
+6 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  greenB
+7 LHC = 23.80,304.56,94.92  RGB_raw =  0.173, 0.091, 0.664  blue
+8 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  magenta
+
+Filter wavelength = 680 nm
+1 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  white
+2 LHC = 39.80, 33.12,87.12  RGB_raw =  0.778,-0.176, 0.058  red
+3 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  orange
+4 LHC = 30.60, 56.88,44.88  RGB_raw =  0.453, 0.218, 0.019  yellow
+5 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  greenY
+6 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  greenB
+7 LHC = 25.80,304.92,105.36  RGB_raw =  0.175, 0.079, 0.737  blue
+8 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  magenta
+
+Filter wavelength = 700 nm
+1 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  white
+2 LHC = 40.70, 35.64,90.48  RGB_raw =  0.794,-0.170, 0.015  red
+3 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  orange
+4 LHC = 31.10, 56.52,43.92  RGB_raw =  0.456, 0.224, 0.032  yellow
+5 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  greenY
+6 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  greenB
+7 LHC = 24.70,307.80,116.28  RGB_raw =  0.226,-0.082, 0.760  blue
+8 LHC =  0.00,  0.00, 0.00  RGB_raw =  0.000, 0.000, 0.000  magenta
+
