@@ -2,66 +2,39 @@
 % I want to get it to run with demo data, to show what the case would be if
 % it was a simple Von Kries scaling.
 
-%% Pre-flight
+%% 
 
 clear, clc, close all
 
-% ciedir = fullfile('C:\Users\cege-user\Dropbox\UCL\Data\Colour standards','CIE colorimetric data');
-% cvrldir = fullfile('C:\Users\cege-user\Dropbox\UCL\Data\Colour standards','CVRL cone fundamentals');
-
-% s1 = 341;               % number of values in 1nm spectrum 390-730 nm
-% w1 = 390:1:730;
-% s5 = 69;                % number of values in 5nm spectrum 390-730 nm
-% w5 = 390:5:730;
-
-% Start pure --------------------
-
-% %% Read Stockman-Sharpe 10-deg cone fundamentals (390-730 nm in 1nm intervals)
-% 
-% ssfile = fullfile(cvrldir,'Stockman-Sharpe cone fundamentals - lin-2deg-1nm.txt');
-% format = '%d %f %f %f';
-% fid = fopen(ssfile,'r');
-% [Obs,count] = fscanf(fid,format,[4,inf]);  % read the whole file into array
-% fclose(fid);
-% 
-% Lcone = Obs(2,1:s1);               % extract cone response data fields
-% Mcone = Obs(3,1:s1);               % data range 380-730nm
-% Scone = Obs(4,1:s1);
-% LMScone = [Lcone; Mcone; Scone];         % 3x341 array
-% 
-% % Read scotopic CIE V'(lambda) 380-780 in 5nm intervals
-% 
-% vsfile = fullfile(ciedir,'CIE 1951 scotopic luminous efficiency.txt');
-% format = '%d %f';
-% fid = fopen(vsfile,'r');
-% [V,count] = fscanf(fid,format,[2,inf]);  % read the whole file into array
-% fclose(fid);
-% 
-% Vint = interp1(380:5:780,V(2,:),380:780,'spline');     % interpolate to 1nm
-% Vprime = Vint(11:s1+10);                % extract range 390-730 nm
-% 
-% % End pure ---------------------
-
+% Load observer
 load T_cones_ss10.mat
 load T_rods.mat
+T_obs = [T_cones_ss10; SplineCmf(S_rods,T_rods,S_cones_ss10)];
+S_obs = S_cones_ss10;
+clear T_cones_ss10 S_cones_ss10 T_rods S_rods %cleanup
+figure, plot(SToWls(S_obs),T_obs')
 
 %% Grabbing bits to make an empty data container
 
-wmin = 400;  wmax = 700;            % range of wavelengths (20nm intervals)
-wrange = wmin:20:wmax;
+% Load spectrums of peripheral stimuli
+load('C:\Users\cege-user\Dropbox\UCL\Data\LargeSphere\Hardware Data\Filter spectra\Illumination in sphere.mat','spectra')
+spectra = SplineSpd([380,4,101],spectra(:,2:17),S_obs);
 
+wmin = 400;                         % minimum wavelength filter
+wmax = 700;                         % maximum wavelength filter            
+wrange = wmin:20:wmax;              % range of wavelengths (20nm intervals)
 N = 10;                             % number of repetitions over time
 LN = 16;                            % number of lightness levels per repeat
 WN = length(wrange);                % number of wavelength samples
-
-Lval = 85:-5:10;
+Lval = 85:-5:10;                    % lightness values
 
 %TNM = floor(min(TI(4,:)/60));      % find length of shortest session (minutes)
-TNM = 72;                           % DG: This is what it ends up as
+TNM = 72;                           % (DG note: This is what the real 2013 data ends up as)
 
-LMSR = zeros(4,LN,TNM,WN,'double'); % LMSR of match (Should be 4,16,72,16)
+LMSR = zeros(4,LN,TNM,WN,'double'); % Empty data container (Should be 4,16,72,16)
 
 % SO, what do these number mean?
+
 % 4 - Long, Medium, Short, Rod
 % 16 - number of lightness levels (LN)
 % 72 - minutes of session
@@ -69,18 +42,16 @@ LMSR = zeros(4,LN,TNM,WN,'double'); % LMSR of match (Should be 4,16,72,16)
 
 %% Generate simulated data
 
-% Load spectrums of peripheral stimuli
-load('C:\Users\cege-user\Dropbox\UCL\Data\LargeSphere\Hardware Data\Filter spectra\Illumination in sphere.mat','spectra')
-S_spectra = [380,4,101];
+norm = 1;
 
 for ii = 1:size(LMSR,1)         % each sensor
-    for jj = 1%:LN              % (let's just do one lightness level for now)
-        for kk = 1%:TNM         % (let's assume the same across time for now)
+    for jj = 1:LN              % (let's just do one lightness level for now)
+        for kk = 1:TNM         % (let's assume the same across time for now)
             for mm = 1:WN       % for each wavelength sample
 
-                light = spectra(:,mm+1);
- %               sensor = SplineCmf(Obs(ii,:);
-                stimulation = light * sensor;
+                light = spectra(:,mm);
+                sensor = T_obs(ii,:);
+                stimulation = sensor * light;
                 nsfwp = norm * stimulation; %needed stimulation for white point
                 LMSR(ii,jj,kk,mm) = nsfwp;
             end
@@ -91,7 +62,7 @@ end
 
 %%
 
-% Start pure ----------------------------
+% Start pure(ish) ----------------------------
 
 %% Plot 3D surfaces of LMSR vs wavelength and time for constant lightness
 
