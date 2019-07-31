@@ -8,7 +8,7 @@
 clear, clc, close all
 
 rootdir = 'C:\Users\cege-user\Dropbox\UCL\Data\LargeSphere';
-dir = 'C:\Users\cege-user\Dropbox\UCL\Data\LargeSphere\Experimental Data\Apr 2013';
+dir = 'C:\Users\cege-user\Dropbox\UCL\Data\LargeSphere\Experimental Data\2013 Apr TR';
 
 s1 = 341;               % number of values in 1nm spectrum 390-730 nm
 w1 = 390:1:730;

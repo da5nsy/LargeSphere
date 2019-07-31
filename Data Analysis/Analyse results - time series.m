@@ -10,17 +10,17 @@ clear, clc, close all
 name = 'Lindsay';
 filter_lambda = 480;                  % filter wavelength
 
-rootdir = fullfile('C:','Users','cege-user','Dropbox','UCL','Data','LargeSphere');
+rootdir = fullfile('C:\Users\cege-user\Dropbox\UCL\Data\LargeSphere\Experimental Data');
 
 if strcmp(name,'Lindsay');
   fname = sprintf('%dnm - time.mat',filter_lambda);
-  ifile = fullfile(rootdir,'Lindsay time series - Sep 2012',fname);
+  ifile = fullfile(rootdir,'2012 Sep LM','Lindsay time series - Sep 2012',fname);
 elseif strcmp(name,'Tania');
   fname = sprintf('%dnm - time.mat',filter_lambda);
-  ifile = fullfile(rootdir,'Tania time series - Apr 2013',fname);
+  ifile = fullfile(rootdir,'2013 Apr TR',fname);
 else
   fname = sprintf('%dnm - time v2_4.mat',filter_lambda);
-  ifile = fullfile(rootdir,'Danny time series - Dec 2016','Results',fname);
+  ifile = fullfile(rootdir,'2016 Oct DG',fname);
 end
 load(ifile);                 % load experimental results for wavelength
 
@@ -28,7 +28,7 @@ N = 10;                             % number of repetitions over time
 LN = 16;                            % number of lightness levels per repeat
 
 Lval = squeeze(LABmatch(1,:,1));    % L values
-dfile = fullfile(rootdir,'Large LCD display measurement.mat');
+dfile = 'C:\Users\cege-user\Dropbox\UCL\Data\LargeSphere\Hardware Data\Calibration Data\Large LCD display measurement.mat';
 load(dfile);                        % load display data
 
 %% Make mosaic of matching colours - lightness vs iteration
@@ -53,7 +53,7 @@ for n = 1:N
 end
 
 iname = fullfile(rootdir,sprintf('%s matches, %dnm_4.tif',name,filter_lambda));
-imwrite(Im,iname,'tif');           % write the image
+%imwrite(Im,iname,'tif');           % write the image
 
 %% Plot results as 3D surfaces
 
@@ -286,7 +286,8 @@ ylabel('Relative B');
 
 % Read standard observer CMFs (380-780 nm, 1nm intervals)
 
-ciedir = fullfile('D:','Research at UCL','Colour standards','CIE colorimetric data');
+ciedir = 'C:\Users\cege-user\Dropbox\UCL\Data\Colour standards\CIE colorimetric data';
+%ciedir = fullfile('D:','Research at UCL','Colour standards','CIE colorimetric data');
 cmffile = fullfile(ciedir,'StdObs-2deg-1nm.txt');
 format = '%d %f %f %f';
 fid = fopen(cmffile, 'r');
@@ -373,9 +374,9 @@ for m = 1:nmin
   [LD(m) AD(m) BD(m)] = XYZtoLAB(X,Y,Z,Xw,Yw,Zw);  % convert to LAB
 end
 
-%figure;  hold on;
-%title('Composite SPD');
-%plot(380:780,SPD,'-k');
+figure;  hold on;
+title('Composite SPD');
+plot(380:780,SPD,'-k');
 
 %% Plot a*,b* as a function of time
 
