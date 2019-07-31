@@ -9,6 +9,7 @@ clear, clc, close all
 
 rootdir = 'C:\Users\cege-user\Dropbox\UCL\Data\LargeSphere';
 dir = 'C:\Users\cege-user\Dropbox\UCL\Data\LargeSphere\Experimental Data\2013 Apr TR';
+%dir = 'C:\Users\cege-user\Dropbox\UCL\Data\LargeSphere\Experimental Data\2012 Sep LM\Lindsay time series - Sep 2012';
 
 s1 = 341;               % number of values in 1nm spectrum 390-730 nm
 w1 = 390:1:730;
@@ -19,9 +20,9 @@ load T_rods.mat
 T_obs = [T_cones_ss10; SplineCmf(S_rods,T_rods,S_cones_ss10)];
 S_obs = S_cones_ss10;
 
-LMScone2 = T_cones_ss10(:,1:341);
-Vprime2 = SplineCmf(S_rods,T_rods,w1'); %for back compatibility with LM's code
-V2 = [SToWls(S_rods)';T_rods]; %for back compatibility with LM's code
+LMScone = T_cones_ss10(:,1:341);
+Vprime = SplineCmf(S_rods,T_rods,w1'); %for back compatibility with LM's code
+V = [SToWls(S_rods)';T_rods]; %for back compatibility with LM's code
 
 clear T_cones_ss10 S_cones_ss10 T_rods S_rods %cleanup
 figure, plot(SToWls(S_obs),T_obs')

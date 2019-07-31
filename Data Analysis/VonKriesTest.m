@@ -12,7 +12,7 @@ load T_rods.mat
 T_obs = [T_cones_ss10; SplineCmf(S_rods,T_rods,S_cones_ss10)];
 S_obs = S_cones_ss10;
 clear T_cones_ss10 S_cones_ss10 T_rods S_rods %cleanup
-figure, plot(SToWls(S_obs),T_obs')
+%figure, plot(SToWls(S_obs),T_obs')
 
 %% Grabbing bits to make an empty data container
 
