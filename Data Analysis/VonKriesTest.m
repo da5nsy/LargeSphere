@@ -18,6 +18,7 @@ figure, plot(SToWls(S_obs),T_obs')
 
 % Load spectrums of peripheral stimuli
 load('C:\Users\cege-user\Dropbox\UCL\Data\LargeSphere\Hardware Data\Filter spectra\Illumination in sphere.mat','spectra')
+figure, plot(SToWls([380,4,101]),spectra(:,2:17))
 spectra = SplineSpd([380,4,101],spectra(:,2:17),S_obs);
 
 wmin = 400;                         % minimum wavelength filter
@@ -62,7 +63,7 @@ end
 
 %%
 
-% Start pure(ish) ----------------------------
+% Start pure ----------------------------
 
 %% Plot 3D surfaces of LMSR vs wavelength and time for constant lightness
 

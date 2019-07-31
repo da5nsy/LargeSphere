@@ -12,47 +12,20 @@ dir = 'C:\Users\cege-user\Dropbox\UCL\Data\LargeSphere\Experimental Data\2013 Ap
 
 s1 = 341;               % number of values in 1nm spectrum 390-730 nm
 w1 = 390:1:730;
-s5 = 69;                % number of values in 5nm spectrum 390-730 nm
-w5 = 390:5:730;
 
-ciedir = fullfile('C:\Users\cege-user\Dropbox\UCL\Data\Colour standards','CIE colorimetric data');
-cvrldir = fullfile('C:\Users\cege-user\Dropbox\UCL\Data\Colour standards','CVRL cone fundamentals');
+% Load observer
+load T_cones_ss10.mat
+load T_rods.mat
+T_obs = [T_cones_ss10; SplineCmf(S_rods,T_rods,S_cones_ss10)];
+S_obs = S_cones_ss10;
 
-%% Read Stockman-Sharpe 10-deg cone fundamentals (390-730 nm in 1nm intervals)
+LMScone2 = T_cones_ss10(:,1:341);
+Vprime2 = SplineCmf(S_rods,T_rods,w1'); %for back compatibility with LM's code
+V2 = [SToWls(S_rods)';T_rods]; %for back compatibility with LM's code
 
-ssfile = fullfile(cvrldir,'Stockman-Sharpe cone fundamentals - lin-2deg-1nm.txt');
-format = '%d %f %f %f';
-fid = fopen(ssfile,'r');
-[Obs,count] = fscanf(fid,format,[4,inf]);  % read the whole file into array
-fclose(fid);
+clear T_cones_ss10 S_cones_ss10 T_rods S_rods %cleanup
+figure, plot(SToWls(S_obs),T_obs')
 
-Lcone = Obs(2,1:s1);               % extract cone response data fields
-Mcone = Obs(3,1:s1);               % data range 380-730nm
-Scone = Obs(4,1:s1);
-LMScone = [Lcone; Mcone; Scone];         % 3x341 array
-
-% Read scotopic CIE V'(lambda) 380-780 in 5nm intervals
-
-vsfile = fullfile(ciedir,'CIE 1951 scotopic luminous efficiency.txt');
-format = '%d %f';
-fid = fopen(vsfile,'r');
-[V,count] = fscanf(fid,format,[2,inf]);  % read the whole file into array
-fclose(fid);
-
-Vint = interp1(380:5:780,V(2,:),380:780,'spline');     % interpolate to 1nm
-Vprime = Vint(11:s1+10);                % extract range 390-730 nm
-
-%% Plot cone fundamentals
-
-figure;  hold on;
-title('CVRL 2-deg cone fundamentals');
-plot(w1,Lcone,'-r');
-plot(w1,Mcone,'-g');
-plot(w1,Scone,'-b');
-plot(w1,Vprime,'-k');
-legend('L cone','M cone','S cone','Rod');
-xlabel('Wavelength (nm)');
-ylabel('Relative sensitivity');
 
 %% Read experimental data for neutral matching
 
