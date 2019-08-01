@@ -119,8 +119,8 @@ storeCW_L = zeros(3,1);
 storeCW_M = zeros(3,1);
 storeCW_S = zeros(3,1);
 
-for j=1:10000
-    ConeWeights = rand(size(LMSI_sim,1)-1,1)*20-10;
+for j=1:1000
+    ConeWeights = rand(size(LMSI_sim,1)-1,1)*50-25;
     randomEffect = zeros([72,16]);
     for i=1:3
         randomEffect = randomEffect + squeeze((LMSI_sim(i,:,:)*ConeWeights(i,1)));
@@ -138,7 +138,7 @@ for j=1:10000
     % Compare random effect with our actual data
     LMSI_real_slim = squeeze(mean(LMSI_real,2));
     for k=1:3
-        if min(corrcoef(randomEffect_slim,LMSI_real_slim(k,:)')) >0.77
+        if min(corrcoef(randomEffect_slim,LMSI_real_slim(k,:)')) >0.9
             corrcoef(randomEffect_slim,LMSI_real_slim(k,:)');
             if k==1
             storeCW_L = cat(3,storeCW_L,ConeWeights);
@@ -151,6 +151,9 @@ for j=1:10000
             end
         end
         
+    end
+    if mod(j,10000) == 0
+        disp(j)
     end
 end
 
@@ -229,4 +232,4 @@ xticklabels(wrange)
 colormap gray
 colorbar
 
-
+%%% figure, scatter(randomEffect(1,:),LMSI_real_slim(1,:))
