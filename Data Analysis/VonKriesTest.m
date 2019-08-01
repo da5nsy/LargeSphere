@@ -115,13 +115,12 @@ end
 
 %rng(1)
 
-storeCW_L = zeros(4,1);
-storeCW_M = zeros(4,1);
-storeCW_S = zeros(4,1);
-storeCW_R = zeros(4,1);
+storeCW_L = zeros(3,1);
+storeCW_M = zeros(3,1);
+storeCW_S = zeros(3,1);
 
 for j=1:10000
-    ConeWeights = rand(size(LMSI_sim,1),1)*20-10;
+    ConeWeights = rand(size(LMSI_sim,1)-1,1)*20-10;
     randomEffect = zeros([72,16]);
     for i=1:3
         randomEffect = randomEffect + squeeze((LMSI_sim(i,:,:)*ConeWeights(i,1)));
@@ -156,6 +155,7 @@ for j=1:10000
 end
 
 %% Visualise successes
+
 for j=2%:10%size(storeCW,3)
     randomEffect = zeros([72,16]);
     for i=1:3
@@ -209,6 +209,7 @@ title('REAL(ish) L')
 xticks(1:16)
 xticklabels(wrange)
 colormap gray
+colorbar
 
 figure,
 imagesc(LMSI_real_slim(2,:))
@@ -217,6 +218,7 @@ title('REAL(ish) M')
 xticks(1:16)
 xticklabels(wrange)
 colormap gray
+colorbar
 
 figure,
 imagesc(LMSI_real_slim(3,:))
@@ -225,5 +227,6 @@ title('REAL(ish) S')
 xticks(1:16)
 xticklabels(wrange)
 colormap gray
+colorbar
 
 
