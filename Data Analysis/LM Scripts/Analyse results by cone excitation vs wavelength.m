@@ -303,32 +303,27 @@ zlabel('S cone');
 
 %% Plot 3D surfaces of LMSR vs wavelength and time for constant lightness
 
-lness = 8;              % lightness (fixed)
-WI = 400:5:700;
-wl = length(WI);
-LMSI = zeros(4,wl,TNM,'double');
+lness = 6:11;              % lightness (can be single or multiple)
+LMSI=squeeze(mean(LMSR(:,lness,:,:),2));
+labels = {'L','M','S'};
 
-for t = 1:TNM
-  for k = 1:4
-    v = squeeze(LMSR(k,lness,t,:));    % extract LMSR values for all wavelengths
-    LMSI(k,:,t) = interp1(wrange,v,WI,'spline');  % interpolate to 5nm intervals
-  end
+figure('units','normalized','outerposition',[0 0 1 1])
+for i=1:3
+    subplot(1,3,i)
+    imagesc(squeeze(LMSI(i,:,:)))
+    set(gca,'YDir','normal')
+    %colorbar
+    
+    xticks(1:16)
+    xticklabels(wrange)
+    xlabel({'Wavelength of adapting field (nm)',labels{i}});
+    if i == 1
+    ylabel('Time (min)');
+    end    
+    colormap gray    
 end
 
-lp = reshape(LMSR(1,lness,:,:),TNM*WN,1);    % extract L as vector
-ml = mean(lp);                              % mean L over plane
-sl = std(lp);
-lm = reshape(LMSR(2,lness,:,:),TNM*WN,1);    % extract M as vector
-mm = mean(lm);                              % mean M over plane
-sm = std(lm);
-ls = reshape(LMSR(3,lness,:,:),TNM*WN,1);    % extract S as vector
-ms = mean(ls);                              % mean S over plane
-ss = std(ls);
-fprintf(1,'\nStd and mean cone excitations for target lightness %d\n',Lval(lness));
-fprintf(1,'L %f/%f=%5.3f,  M %f/%f=%5.3f,  S %f/%f=%5.3f\n',...
-            sl,ml,sl/ml,sm,mm,sm/mm,ss,ms,ss/ms); 
-
-% Plot figures
+%% Plot figures
 
 [XL,YL] = meshgrid(WI,1:TNM);
 
@@ -368,118 +363,118 @@ ylabel('Time (min)');
 zlabel('Rod excitation');
 axis([WI(1) WI(wl) 1 TNM]);
 
-%% Plot 3D surfaces vs wavelength and lightness at given time
-
-tm = 30;                              % time (minutes)
-LNI = 20:75;
-li = length(LNI);
-LMSI = zeros(3,wl,li,'double');
-
-for k = 1:3
-  V = squeeze(LMSR(k,3:LN-2,tm,:));    % extract LMS values for all lightness levels and wavelengths
-  for i = 1:LN-4
-    vm = mean(V(i,:));                % mean value over all wavelengths for each lightness
-    V(i,:) = V(i,:)/vm;
-  end
-  LMSI(k,:,:) = interp2(Lval(3:LN-2)',wrange,V',LNI',WI,'spline');  % interpolate to 5nm intervals
-end
-
-[XL,YL] = meshgrid(WI,LNI);
-
-figure;  hold on;  rotate3d;  grid on;
-title(sprintf('L cone excitation for wavelength vs lightness, time = %d min',tm));
-ZL = squeeze(LMSI(1,:,:))';
-surf(XL,YL,ZL);
-axis([400 700 20 75 0.8 1.2]);
-xlabel('Wavelength of adapting field (nm)');
-ylabel('Lightness of target');
-zlabel('L cone excitation relative to mean across all wavelengths');
-
-figure;  hold on;  rotate3d;  grid on;
-title(sprintf('M cone excitation for wavelength vs lightness, time = %d min',tm));
-ZL = squeeze(LMSI(2,:,:))';
-surf(XL,YL,ZL);
-axis([400 700 20 75 0.8 1.2]);
-xlabel('Wavelength of adapting field (nm)');
-ylabel('Lightness of target');
-zlabel('M cone excitation relative to mean across all wavelengths');
-
-figure;  hold on;  rotate3d;  grid on;
-title(sprintf('S cone excitation for wavelength vs lightness, time = %d min',tm));
-ZL = squeeze(LMSI(3,:,:))';
-surf(XL,YL,ZL);
-axis([400 700 20 75 0.5 1.5]);
-xlabel('Wavelength of adapting field (nm)');
-ylabel('Lightness of target');
-zlabel('S cone excitation relative to mean across all wavelengths');
-
-%% Plot surface of L-M chromatic opponent channel for wavelength vs time
-
-lness = 8;
-YCC = zeros(3,wl,TNM,'double');   % Y=R+G, Cr=R-G, Cb=Y-B
-
-for t = 1:TNM
-  cr = squeeze(LMSR(1,lness,t,:));    % extract L values for all wavelengths
-  cri = interp1(wrange,cr,WI,'spline');
-  cg = squeeze(LMSR(2,lness,t,:));    % extract M values for all wavelengths
-  cgi = interp1(wrange,cg,WI,'spline');
-  cb = squeeze(LMSR(3,lness,t,:));    % extract S values for all wavelengths
-  cbi = interp1(wrange,cb,WI,'spline');
-  YCC(1,:,t) = cri+cgi;
-  YCC(2,:,t) = cri-cgi;
-  YCC(3,:,t) = cri+cgi-cbi;
-end
-
-[XL,YL] = meshgrid(WI,1:TNM);
-
-figure;  hold on;  rotate3d;  grid on;
-ylim([1 TNM]);
-title(sprintf('Cone L+M luminance for wavelength vs time, lightness = %d',Lval(lness)));
-ZL = squeeze(YCC(1,:,:));
-surf(XL,YL,ZL');
-xlabel('Wavelength of adapting field (nm)');
-ylabel('Time (min)');
-zlabel('Cone L+M');
-
-figure;  hold on;  rotate3d;  grid on;
-title(sprintf('Cone L-M opponent channel for wavelength vs time, lightness = %d',Lval(lness)));
-ylim([1 TNM]);
-ZL = squeeze(YCC(2,:,:));
-surf(XL,YL,ZL');
-xlabel('Wavelength of adapting field (nm)');
-ylabel('Time (min)');
-zlabel('Cone L-M');
-
-figure;  hold on;  rotate3d;  grid on;
-title(sprintf('Cone Y-S opponent channel for wavelength vs time, lightness = %d',Lval(lness)));
-ylim([1 TNM]);
-ZL = squeeze(YCC(3,:,:));
-surf(XL,YL,ZL');
-xlabel('Wavelength of adapting field (nm)');
-ylabel('Time (min)');
-zlabel('Cone L+M-S');
-
-%% Plot LMS over time for one wavelength
-
-lam = 2;
-lambda = wrange(lam);
-
-figure;  hold on;
-title(sprintf('LMS cone excitation vs time, adapting wavelength = %d nm',lambda));
-tmax = TI(4,lam);                         % session length (sec) for this wavelength
-xlim([1 TNM]);                            % X axis in minutes
-rvi = squeeze(LMSR(1,:,1:TNM,lam));       % extract all L values for wavelength
-rvm = mean(rvi(1:LN,:));                  % mean over all lightnesses
-plot(1:TNM,rvm,'-r','LineWidth',2);       % plot as thick line
-gvi = squeeze(LMSR(2,:,1:TNM,lam));       % extract all M values for wavelength
-gvm = mean(gvi(1:LN,:));                  % mean over all lightnesses
-plot(1:TNM,gvm,'-g','LineWidth',2);       % plot as thick line
-bvi = squeeze(LMSR(3,:,1:TNM,lam));       % extract all S values for wavelength
-bvm = mean(bvi(1:LN,:));                  % mean over all lightnesses
-plot(1:TNM,bvm,'-b','LineWidth',2);       % plot as thick line
-%kvi = squeeze(LMSR(4,:,1:TNM,lam));      % extract all R values for wavelength
-%kvm = mean(kvi(1:LN,:));                 % mean over all lightnesses
-%plot(1:TNM,kvm,'-k','LineWidth',2);      % plot as thick line
-tm = ceil(max(TI(4,:))/60);               % length of longest session (minutes)
-xlabel('Time (min)');
-ylabel('Value relative to mean over all iterations');
+% %% Plot 3D surfaces vs wavelength and lightness at given time
+% 
+% tm = 30;                              % time (minutes)
+% LNI = 20:75;
+% li = length(LNI);
+% LMSI = zeros(3,wl,li,'double');
+% 
+% for k = 1:3
+%   V = squeeze(LMSR(k,3:LN-2,tm,:));    % extract LMS values for all lightness levels and wavelengths
+%   for i = 1:LN-4
+%     vm = mean(V(i,:));                % mean value over all wavelengths for each lightness
+%     V(i,:) = V(i,:)/vm;
+%   end
+%   LMSI(k,:,:) = interp2(Lval(3:LN-2)',wrange,V',LNI',WI,'spline');  % interpolate to 5nm intervals
+% end
+% 
+% [XL,YL] = meshgrid(WI,LNI);
+% 
+% figure;  hold on;  rotate3d;  grid on;
+% title(sprintf('L cone excitation for wavelength vs lightness, time = %d min',tm));
+% ZL = squeeze(LMSI(1,:,:))';
+% surf(XL,YL,ZL);
+% axis([400 700 20 75 0.8 1.2]);
+% xlabel('Wavelength of adapting field (nm)');
+% ylabel('Lightness of target');
+% zlabel('L cone excitation relative to mean across all wavelengths');
+% 
+% figure;  hold on;  rotate3d;  grid on;
+% title(sprintf('M cone excitation for wavelength vs lightness, time = %d min',tm));
+% ZL = squeeze(LMSI(2,:,:))';
+% surf(XL,YL,ZL);
+% axis([400 700 20 75 0.8 1.2]);
+% xlabel('Wavelength of adapting field (nm)');
+% ylabel('Lightness of target');
+% zlabel('M cone excitation relative to mean across all wavelengths');
+% 
+% figure;  hold on;  rotate3d;  grid on;
+% title(sprintf('S cone excitation for wavelength vs lightness, time = %d min',tm));
+% ZL = squeeze(LMSI(3,:,:))';
+% surf(XL,YL,ZL);
+% axis([400 700 20 75 0.5 1.5]);
+% xlabel('Wavelength of adapting field (nm)');
+% ylabel('Lightness of target');
+% zlabel('S cone excitation relative to mean across all wavelengths');
+% 
+% %% Plot surface of L-M chromatic opponent channel for wavelength vs time
+% 
+% lness = 8;
+% YCC = zeros(3,wl,TNM,'double');   % Y=R+G, Cr=R-G, Cb=Y-B
+% 
+% for t = 1:TNM
+%   cr = squeeze(LMSR(1,lness,t,:));    % extract L values for all wavelengths
+%   cri = interp1(wrange,cr,WI,'spline');
+%   cg = squeeze(LMSR(2,lness,t,:));    % extract M values for all wavelengths
+%   cgi = interp1(wrange,cg,WI,'spline');
+%   cb = squeeze(LMSR(3,lness,t,:));    % extract S values for all wavelengths
+%   cbi = interp1(wrange,cb,WI,'spline');
+%   YCC(1,:,t) = cri+cgi;
+%   YCC(2,:,t) = cri-cgi;
+%   YCC(3,:,t) = cri+cgi-cbi;
+% end
+% 
+% [XL,YL] = meshgrid(WI,1:TNM);
+% 
+% figure;  hold on;  rotate3d;  grid on;
+% ylim([1 TNM]);
+% title(sprintf('Cone L+M luminance for wavelength vs time, lightness = %d',Lval(lness)));
+% ZL = squeeze(YCC(1,:,:));
+% surf(XL,YL,ZL');
+% xlabel('Wavelength of adapting field (nm)');
+% ylabel('Time (min)');
+% zlabel('Cone L+M');
+% 
+% figure;  hold on;  rotate3d;  grid on;
+% title(sprintf('Cone L-M opponent channel for wavelength vs time, lightness = %d',Lval(lness)));
+% ylim([1 TNM]);
+% ZL = squeeze(YCC(2,:,:));
+% surf(XL,YL,ZL');
+% xlabel('Wavelength of adapting field (nm)');
+% ylabel('Time (min)');
+% zlabel('Cone L-M');
+% 
+% figure;  hold on;  rotate3d;  grid on;
+% title(sprintf('Cone Y-S opponent channel for wavelength vs time, lightness = %d',Lval(lness)));
+% ylim([1 TNM]);
+% ZL = squeeze(YCC(3,:,:));
+% surf(XL,YL,ZL');
+% xlabel('Wavelength of adapting field (nm)');
+% ylabel('Time (min)');
+% zlabel('Cone L+M-S');
+% 
+% %% Plot LMS over time for one wavelength
+% 
+% lam = 2;
+% lambda = wrange(lam);
+% 
+% figure;  hold on;
+% title(sprintf('LMS cone excitation vs time, adapting wavelength = %d nm',lambda));
+% tmax = TI(4,lam);                         % session length (sec) for this wavelength
+% xlim([1 TNM]);                            % X axis in minutes
+% rvi = squeeze(LMSR(1,:,1:TNM,lam));       % extract all L values for wavelength
+% rvm = mean(rvi(1:LN,:));                  % mean over all lightnesses
+% plot(1:TNM,rvm,'-r','LineWidth',2);       % plot as thick line
+% gvi = squeeze(LMSR(2,:,1:TNM,lam));       % extract all M values for wavelength
+% gvm = mean(gvi(1:LN,:));                  % mean over all lightnesses
+% plot(1:TNM,gvm,'-g','LineWidth',2);       % plot as thick line
+% bvi = squeeze(LMSR(3,:,1:TNM,lam));       % extract all S values for wavelength
+% bvm = mean(bvi(1:LN,:));                  % mean over all lightnesses
+% plot(1:TNM,bvm,'-b','LineWidth',2);       % plot as thick line
+% %kvi = squeeze(LMSR(4,:,1:TNM,lam));      % extract all R values for wavelength
+% %kvm = mean(kvi(1:LN,:));                 % mean over all lightnesses
+% %plot(1:TNM,kvm,'-k','LineWidth',2);      % plot as thick line
+% tm = ceil(max(TI(4,:))/60);               % length of longest session (minutes)
+% xlabel('Time (min)');
+% ylabel('Value relative to mean over all iterations');
