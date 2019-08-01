@@ -76,29 +76,46 @@ for ii = 1:size(LMSR_sim,1)    % each sensor
     end
 end
 
-%% Plot 3D surfaces of LMSR vs wavelength and time for constant lightness
+%% Plot stuff
 
 lness = 6:11;              % lightness (can be single or multiple)
 LMSI_sim=squeeze(mean(LMSR_sim(:,lness,:,:),2));
 labels = {'L','M','S','R','I'};
 
+timeplt = 0;
+
 if plt
-    figure('units','normalized','outerposition',[0 0 1 1])
+    figure,%('units','normalized','outerposition',[0 0 1 1])    
     for i=1:size(T_obs,1)
-        subplot(1,size(T_obs,1),i)
+        if timeplt
+            subplot(1,size(T_obs,1),i)
+        else
+            subplot(size(T_obs,1),1,i)
+        end
         imagesc(squeeze(LMSI_sim(i,:,:)))
+        colormap gray
         set(gca,'YDir','normal')
         %colorbar
-        
         xticks(1:16)
         xticklabels(wrange)
-        xlabel({'Wavelength of adapting field (nm)',labels{i}});
-        if i == 1
-            ylabel('Time (min)');
+        if timeplt
+            xlabel({'Wavelength of adapting field (nm)',labels{i}});
+            if i == 1
+                ylabel('Time (min)');
+            end
+        else
+            yticks('')
+            ylabel(labels{i})
+            if i~=size(T_obs,1)
+                xticks('')
+            else
+                xlabel('Wavelength of adapting field (nm)')
+            end
         end
-        colormap gray
     end
 end
+
+save2pdf('C:\Users\cege-user\Dropbox\UCL\Ongoing Work\Thesis\figs\LargeSphere\LSsimdata')
 
 %% Load a real dataset
 load 'C:\Users\cege-user\Dropbox\UCL\Data\LargeSphere\Data Analysis\Tania LMSI for testing VonKriesTest'
@@ -122,6 +139,42 @@ if plt
     end
 end
 
+%% Basic comparison
+
+figure,
+for k=1:nOut
+    subplot(2,nOut,k)
+    imagesc(squeeze(LMSI_sim(k,:,:)))
+    set(gca,'YDir','normal')
+    %colorbar    
+    %xticks(1:16)
+    %xticklabels(wrange)
+    xticks('')
+    %xlabel('Wavelength of adapting field (nm)');
+    title(labels{k})
+    colormap gray
+    yticks('')
+    
+end
+
+% Compared to:
+for i=1:nOut
+    subplot(2,nOut,i+3)
+    imagesc(LMSI_real_slim(i,:))
+    set(gca,'YDir','normal')
+    %title(labels{i})
+    %xticks(1:16)
+    %xticklabels(wrange)
+    colormap gray
+    xticks([1,16])
+    xticklabels([wmin wmax])
+    %colorbar
+    yticks('')
+end
+
+
+save2pdf('C:\Users\cege-user\Dropbox\UCL\Ongoing Work\Thesis\figs\LargeSphere\simVreal')
+
 %% Try random combos of the cones to see if we can emulate the real data
 
 rng(1)
@@ -139,7 +192,7 @@ for q = 1%:100 % Run it X number of times to see whether difference between diff
     end
     
     clear Cstore
-    for i=1:nOut        
+    for i=1:nOut
         Cstore{i} = 0;              %Correlation store
     end
     
@@ -209,7 +262,10 @@ for k=1:nOut
     xticks(1:16)
     xticklabels(wrange)
     colormap gray
-    colorbar
+    %colorbar
+    yticks('')
+    xticks('')
+    title(labels{k})
 end
 
 % Compared to:
@@ -217,12 +273,16 @@ for i=1:nOut
     subplot(2,nOut,i+3)
     imagesc(LMSI_real_slim(i,:))
     set(gca,'YDir','normal')
-    title(labels{i})
     xticks(1:16)
     xticklabels(wrange)
     colormap gray
-    colorbar
+    %colorbar
+    yticks('')
+    xticks([1 16])
+    xticklabels([wmin wmax])
 end
+
+save2pdf('C:\Users\cege-user\Dropbox\UCL\Ongoing Work\Thesis\figs\LargeSphere\maxsimVreal')
 
 %%
 %figure, scatter(randomEffect(1,:),LMSI_real_slim(1,:))
@@ -231,11 +291,18 @@ end
 
 figure,
 for i=1:nOut
-    subplot(1,nOut,i)
-    [~,I] = maxk(Cstore{1,i},max(ceil(runs/100),10)); %show me the top 10, or the top 1%, whichever is more
-    
+    subplot(1,nOut,i), hold on
+    plot([1,nOut],[0,0],'k')
+    [~,I] = maxk(Cstore{1,i},max(ceil(runs/500),10)); %show me the top 10, or the top 0.1%, whichever is more    
     plot(CWstore{1,1}(:,I))
     xlim([1 nIn])
-    xticks(1:nIn)
+    xticklabels(labels)
+    ylim([-SFM/2,SFM/2])
+    yticks(ylim)
+    if i ~=1
+        yticks([])
+    end
 end
+
+save2pdf('C:\Users\cege-user\Dropbox\UCL\Ongoing Work\Thesis\figs\LargeSphere\contributions')
 
