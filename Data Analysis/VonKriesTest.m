@@ -113,123 +113,97 @@ end
 
 %% Try random combos of the cones to see if we can emulate the real data
 
-%rng(1)
+rng(1)
 
-storeCW_L = zeros(3,1);
-storeCW_M = zeros(3,1);
-storeCW_S = zeros(3,1);
-
-for j=1:1000
-    ConeWeights = rand(size(LMSI_sim,1)-1,1)*50-25;
-    randomEffect = zeros([72,16]);
-    for i=1:3
-        randomEffect = randomEffect + squeeze((LMSI_sim(i,:,:)*ConeWeights(i,1)));
+for q = 1:100 % Run it X number of times to see whether difference between different values of nIn is just noise or something meaningful
+    
+    nIn = 4;            %number of inputs (L,M,S,R,I in that order)
+    nOut = 3;
+    runs = 1000;
+    SFM = 50;           %Scaling factor max
+    
+    for i=1:nIn
+        CWstore{i} = zeros(nIn,1);  %Cone weight store
+        Cstore{i} = 0;              %Correlation store
     end
     
-%     figure
-%     imagesc(randomEffect)
-%     set(gca,'YDir','normal')
-%     
-%     xticks(1:16)
-%     xticklabels(wrange)
-%     colormap gray
-    
-    randomEffect_slim = mean(randomEffect,1);
-    % Compare random effect with our actual data
-    LMSI_real_slim = squeeze(mean(LMSI_real,2));
-    for k=1:3
-        if min(corrcoef(randomEffect_slim,LMSI_real_slim(k,:)')) >0.9
-            corrcoef(randomEffect_slim,LMSI_real_slim(k,:)');
-            if k==1
-            storeCW_L = cat(3,storeCW_L,ConeWeights);
-            elseif k==2                
-            storeCW_M = cat(3,storeCW_M,ConeWeights);
-            elseif k==3
-            storeCW_S = cat(3,storeCW_S,ConeWeights);
-%             elseif k==4
-%             storeCW_R = cat(3,storeCW_R,ConeWeights);
-            end
+    for j=1:runs
+        ConeWeights = rand(nIn,1)*SFM-(SFM/2);
+        randomEffect = zeros([TNM,WN]);
+        for i=1:nIn
+            randomEffect = randomEffect + squeeze((LMSI_sim(i,:,:)*ConeWeights(i,1)));
         end
         
+        %     figure
+        %     imagesc(randomEffect)
+        %     set(gca,'YDir','normal')
+        %     xticks(1:16)
+        %     xticklabels(wrange)
+        %     colormap gray
+        
+        randomEffect_slim = mean(randomEffect,1);
+        
+        % Compare random effect with our actual data
+        LMSI_real_slim = squeeze(mean(LMSI_real,2));
+        for k=1:nOut % Just trying to predict L,M,S (for now)
+            corrcoef(randomEffect_slim,LMSI_real_slim(k,:)');
+            CWstore{k} = cat(2,CWstore{k},ConeWeights);
+            Cstore{k} = cat(2,Cstore{k},...
+                min(min(corrcoef(randomEffect_slim,LMSI_real_slim(k,:)'))));
+        end
+        if mod(j,10000) == 0 % to read out progress when running large runs
+            disp(j)
+        end
     end
-    if mod(j,10000) == 0
-        disp(j)
+    
+    %figure,
+    for i=1:nOut
+        %subplot(1,nOut,i)
+        %histogram(abs(Cstore{1,i}))
+        %xlim([0 1])
+        mc(i,q) = max(abs(Cstore{1,i}));
     end
 end
 
-%% Visualise successes
+mean(mc,2)'
+max(mc')
 
-for j=2%:10%size(storeCW,3)
-    randomEffect = zeros([72,16]);
-    for i=1:3
-        randomEffect = randomEffect + squeeze((LMSI_sim(i,:,:)*storeCW_L(i,1,j)));
+%% Visualise best performance
+
+close all
+
+figure,
+
+
+for k=1:nOut
+    subplot(2,nOut,k)
+    [~,j] = max(abs(Cstore{1,k}));
+    randomEffect = zeros([TNM,WN]);
+    for i=1:nIn
+        randomEffect = randomEffect + squeeze((LMSI_sim(i,:,:)*CWstore{1,k}(i,j)));
     end
-    figure
-    imagesc(randomEffect)
+    if Cstore{1,k}(1,j) < 0
+        imagesc(-randomEffect)
+    else
+        imagesc(randomEffect)
+    end
     set(gca,'YDir','normal')
-    
     xticks(1:16)
     xticklabels(wrange)
     colormap gray
     colorbar
 end
 
-for j=2%:10%size(storeCW,3)
-    randomEffect = zeros([72,16]);
-    for i=1:3
-        randomEffect = randomEffect + squeeze((LMSI_sim(i,:,:)*storeCW_M(i,1,j)));
-    end
-    figure
-    imagesc(randomEffect)
+% Compared to:
+for i=1:nOut
+    subplot(2,nOut,i+3)
+    imagesc(LMSI_real_slim(i,:))
     set(gca,'YDir','normal')
-    
+    title(labels{i})
     xticks(1:16)
     xticklabels(wrange)
     colormap gray
     colorbar
 end
-
-for j=2%:10%size(storeCW,3)
-    randomEffect = zeros([72,16]);
-    for i=1:3
-        randomEffect = randomEffect + squeeze((LMSI_sim(i,:,:)*storeCW_S(i,1,j)));
-    end
-    figure
-    imagesc(randomEffect)
-    set(gca,'YDir','normal')
-    
-    xticks(1:16)
-    xticklabels(wrange)
-    colormap gray
-    colorbar
-end
-
-%% Compared to:
-figure,
-imagesc(LMSI_real_slim(1,:))
-set(gca,'YDir','normal')
-title('REAL(ish) L')
-xticks(1:16)
-xticklabels(wrange)
-colormap gray
-colorbar
-
-figure,
-imagesc(LMSI_real_slim(2,:))
-set(gca,'YDir','normal')
-title('REAL(ish) M')
-xticks(1:16)
-xticklabels(wrange)
-colormap gray
-colorbar
-
-figure,
-imagesc(LMSI_real_slim(3,:))
-set(gca,'YDir','normal')
-title('REAL(ish) S')
-xticks(1:16)
-xticklabels(wrange)
-colormap gray
-colorbar
 
 %%% figure, scatter(randomEffect(1,:),LMSI_real_slim(1,:))
