@@ -2,6 +2,11 @@
 % I want to get it to run with demo data, to show what the case would be if
 % it was a simple Von Kries scaling.
 
+% TODO
+
+% Get rid of any concatenation and preallocate instead (speed)
+% Get rid of {} things, they're a hangover from a bad decision
+
 %%
 
 clear, clc, close all
@@ -25,6 +30,10 @@ clear T_cones_ss10 S_cones_ss10 T_rods S_rods T_melanopsin S_melanopsin %cleanup
 load('C:\Users\cege-user\Dropbox\UCL\Data\LargeSphere\Hardware Data\Filter spectra\Illumination in sphere.mat','spectra')
 if plt
     figure, plot(SToWls([380,4,101]),spectra(:,2:17))
+    axis tight
+    xlabel('Wavelength (nm)')
+    ylabel('Radiant Power')
+    save2pdf('C:\Users\cege-user\Dropbox\UCL\Ongoing Work\Thesis\figs\LargeSphere\LSillum')
 end
 spectra = SplineSpd([380,4,101],spectra(:,2:17),S_obs);
 
@@ -117,18 +126,20 @@ end
 
 rng(1)
 
-for q = 1:100 % Run it X number of times to see whether difference between different values of nIn is just noise or something meaningful
+for q = 1%:100 % Run it X number of times to see whether difference between different values of nIn is just noise or something meaningful
     
-    nIn = 5;            %number of inputs (L,M,S,R,I in that order)
+    nIn = 3;            %number of inputs (L,M,S,R,I in that order)
     nOut = 3;
-    runs = 1000;
+    runs = 10000;
     SFM = 50;           %Scaling factor max
     
+    clear CWstore
     for i=1:nIn % This creates duplicate data and no longer needs to be a cell (previously I thresholded the data that I stored based on correlation which left different columns with different lengths, but now we keep everything.
-        CWstore{i} = zeros(nIn,runs);  %Cone weight store
+        CWstore{i} = zeros(nIn,1);  %Cone weight store
     end
     
-    for i=1:nOut
+    clear Cstore
+    for i=1:nOut        
         Cstore{i} = 0;              %Correlation store
     end
     
@@ -172,8 +183,12 @@ for q = 1:100 % Run it X number of times to see whether difference between diffe
     end
 end
 
-disp(mean(mc,2)')
-disp(max(mc'))
+if q > 1 %This is only meaningful if you've run the above multiple times
+    disp(mean(mc,2)')
+    disp(max(mc,[],2)')
+else
+    disp(mc')
+end
 
 %% Visualise best performance
 
@@ -215,6 +230,12 @@ end
 %%
 
 figure,
-subplot(1,nOut,1)
-plot
+for i=1:nOut
+    subplot(1,nOut,i)
+    [~,I] = maxk(Cstore{1,i},max(ceil(runs/100),10)); %show me the top 10, or the top 1%, whichever is more
+    
+    plot(CWstore{1,1}(:,I))
+    xlim([1 nIn])
+    xticks(1:nIn)
+end
 
