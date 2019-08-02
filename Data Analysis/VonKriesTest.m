@@ -6,11 +6,19 @@
 
 % Get rid of any concatenation and preallocate instead (speed)
 % Get rid of {} things, they're a hangover from a bad decision
-
-%%
+% Add plt option so that it doesn't save every time
 
 clear, clc, close all
 
+% figure defaults
+set(groot,'defaultfigureposition',[100 100 500 400]); 
+set(groot,'defaultLineLineWidth',2);
+set(groot,'defaultAxesFontName', 'Courier');
+set(groot,'defaultAxesFontSize',12);
+set(groot,'defaultFigureRenderer', 'painters') %renders pdfs as vectors
+set(groot,'defaultfigurecolor','white')
+
+%%
 plt = 1;
 
 % Load observer
@@ -22,7 +30,7 @@ T_obs = [T_cones_ss10;...
     SplineCmf(S_melanopsin,T_melanopsin,S_cones_ss10)];
 S_obs = S_cones_ss10;
 clear T_cones_ss10 S_cones_ss10 T_rods S_rods T_melanopsin S_melanopsin %cleanup
-%figure, plot(SToWls(S_obs),T_obs')
+figure, plot(SToWls(S_obs),T_obs')
 
 %% Grabbing bits to make an empty data container
 
@@ -139,42 +147,6 @@ if plt
     end
 end
 
-%% Basic comparison
-
-figure,
-for k=1:nOut
-    subplot(2,nOut,k)
-    imagesc(squeeze(LMSI_sim(k,:,:)))
-    set(gca,'YDir','normal')
-    %colorbar    
-    %xticks(1:16)
-    %xticklabels(wrange)
-    xticks('')
-    %xlabel('Wavelength of adapting field (nm)');
-    title(labels{k})
-    colormap gray
-    yticks('')
-    
-end
-
-% Compared to:
-for i=1:nOut
-    subplot(2,nOut,i+3)
-    imagesc(LMSI_real_slim(i,:))
-    set(gca,'YDir','normal')
-    %title(labels{i})
-    %xticks(1:16)
-    %xticklabels(wrange)
-    colormap gray
-    xticks([1,16])
-    xticklabels([wmin wmax])
-    %colorbar
-    yticks('')
-end
-
-
-save2pdf('C:\Users\cege-user\Dropbox\UCL\Ongoing Work\Thesis\figs\LargeSphere\simVreal')
-
 %% Try random combos of the cones to see if we can emulate the real data
 
 rng(1)
@@ -238,10 +210,49 @@ end
 
 if q > 1 %This is only meaningful if you've run the above multiple times
     disp(mean(mc,2)')
-    disp(max(mc,[],2)')
-else
-    disp(mc')
 end
+disp(max(mc,[],2)') %When q is one this just reads out mc, when it's higher it gives the max
+
+%% Basic comparison (sitting here awkwardly instead of higher up because it calls some things from above and I'm too rushed to change it right now)
+
+figure,
+for k=1:nOut
+    subplot(2,nOut,k)
+    imagesc(squeeze(LMSI_sim(k,:,:)))
+    set(gca,'YDir','normal')
+    %colorbar    
+    %xticks(1:16)
+    %xticklabels(wrange)
+    xticks('')
+    %xlabel('Wavelength of adapting field (nm)');
+    title(labels{k})
+    colormap gray
+    yticks('')
+    
+    % Correlation between the original simulated data and the real data
+    x = squeeze(LMSI_sim(k,1,:)); %basic simulation (should be 1,16)
+    y = LMSI_real_slim(k,:);
+    %figure, scatter(x,y);
+    preCorr(k) = min(min(corrcoef(x,y)));
+end
+
+% Compared to:
+for i=1:nOut
+    subplot(2,nOut,i+3)
+    imagesc(LMSI_real_slim(i,:))
+    set(gca,'YDir','normal')
+    %title(labels{i})
+    %xticks(1:16)
+    %xticklabels(wrange)
+    colormap gray
+    xticks([1,16])
+    xticklabels([wmin wmax])
+    %colorbar
+    yticks('')
+end
+
+save2pdf('C:\Users\cege-user\Dropbox\UCL\Ongoing Work\Thesis\figs\LargeSphere\simVreal')
+
 
 %% Visualise best performance
 
@@ -289,20 +300,50 @@ save2pdf('C:\Users\cege-user\Dropbox\UCL\Ongoing Work\Thesis\figs\LargeSphere\ma
 
 %%
 
-figure,
+plt_all = 0; %plot all the lines or just the best?
+
+if plt_all
+    nplot = runs;
+    figure('Renderer','opengl')
+else
+    nplot = max(ceil(runs/500),10); %number to plot (show me the top 10, or the top 0.1%, whichever is more)
+    figure
+end
+
+pltcol = parula(nplot);
+
 for i=1:nOut
     subplot(1,nOut,i), hold on
     plot([1,nOut],[0,0],'k')
-    [~,I] = maxk(Cstore{1,i},max(ceil(runs/500),10)); %show me the top 10, or the top 0.1%, whichever is more    
-    plot(CWstore{1,1}(:,I))
+    [~,I] = maxk(Cstore{1,i},nplot);    
+    for j=nplot:-1:1
+        plot([1,2,3],CWstore{1,1}(:,I(j)),'Color',pltcol(j,:))
+        %disp(Cstore{1,i}(:,I(j)))
+    end
     xlim([1 nIn])
     xticklabels(labels)
     ylim([-SFM/2,SFM/2])
     yticks(ylim)
     if i ~=1
         yticks([])
+    else
+        ylabel('Weights')
     end
 end
 
-save2pdf('C:\Users\cege-user\Dropbox\UCL\Ongoing Work\Thesis\figs\LargeSphere\contributions')
+if plt_all
+    save2pdf('C:\Users\cege-user\Dropbox\UCL\Ongoing Work\Thesis\figs\LargeSphere\contributions_all')
+else
+    save2pdf('C:\Users\cege-user\Dropbox\UCL\Ongoing Work\Thesis\figs\LargeSphere\contributions')
+end
+
+%% Get values for top performer
+
+clc
+
+for i=1:nOut
+    [~,I(i)] = max(Cstore{1,i});
+    a(:,i) = CWstore{1,1}(:,I(i))
+end
+
 
