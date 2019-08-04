@@ -11,7 +11,7 @@
 clear, clc, close all
 
 % figure defaults
-set(groot,'defaultfigureposition',[100 100 500 400]); 
+set(groot,'defaultfigureposition',[100 100 500 400]);
 set(groot,'defaultLineLineWidth',2);
 set(groot,'defaultAxesFontName', 'Courier');
 set(groot,'defaultAxesFontSize',12);
@@ -93,7 +93,7 @@ labels = {'L','M','S','R','I'};
 timeplt = 0;
 
 if plt
-    figure,%('units','normalized','outerposition',[0 0 1 1])    
+    figure,%('units','normalized','outerposition',[0 0 1 1])
     for i=1:size(T_obs,1)
         if timeplt
             subplot(1,size(T_obs,1),i)
@@ -150,11 +150,13 @@ end
 %% Try random combos of the cones to see if we can emulate the real data
 
 rng(1)
+clear CWstore Cstore mc % clearing just in case you've gone further down in the script and are coming back
 
-for q = 1%:100 % Run it X number of times to see whether difference between different values of nIn is just noise or something meaningful
+for q = 1%100 % Run it X number of times to see whether difference between different values of nIn is just noise or something meaningful
     
-    nIn = 3;            %number of inputs (L,M,S,R,I in that order)
+    nIn = 5;            %number of inputs (L,M,S,R,I in that order)
     nOut = 3;
+    ignoreRods = 1;
     runs = 10000;
     SFM = 50;           %Scaling factor max
     
@@ -172,7 +174,9 @@ for q = 1%:100 % Run it X number of times to see whether difference between diff
         ConeWeights = rand(nIn,1)*SFM-(SFM/2);
         randomEffect = zeros([TNM,WN]);
         for i=1:nIn
-            randomEffect = randomEffect + squeeze((LMSI_sim(i,:,:)*ConeWeights(i,1)));
+            if ~and(i == 4, ignoreRods == 1) %, nIn == 5 % don't seem to be able to add more than 2 things to and, not important but would be nice
+                randomEffect = randomEffect + squeeze((LMSI_sim(i,:,:)*ConeWeights(i,1)));
+            end
         end
         
         %     figure
@@ -194,7 +198,7 @@ for q = 1%:100 % Run it X number of times to see whether difference between diff
             Cstore{k} = cat(2,Cstore{k},...
                 min(min(corrcoef(randomEffect_slim,LMSI_real_slim(k,:)'))));
         end
-        if mod(j,10000) == 0 % to read out progress when running large runs
+        if and(mod(j,10000) == 0, j == 1) % to read out progress when running large runs, but not when doing *repeated* large runs
             disp(j)
         end
     end
@@ -204,14 +208,15 @@ for q = 1%:100 % Run it X number of times to see whether difference between diff
         %subplot(1,nOut,i)
         %histogram(abs(Cstore{1,i}))
         %xlim([0 1])
-        mc(i,q) = max(abs(Cstore{1,i}));
+        mc(i,q) = max(abs(Cstore{1,i})); %max correlation
     end
+    disp(q)
 end
 
 if q > 1 %This is only meaningful if you've run the above multiple times
     disp(mean(mc,2)')
 end
-disp(max(mc,[],2)') %When q is one this just reads out mc, when it's higher it gives the max
+disp(max(mc,[],2)') %When q is one this just simply reads out mc, when it's higher it gives the max
 
 %% Basic comparison (sitting here awkwardly instead of higher up because it calls some things from above and I'm too rushed to change it right now)
 
@@ -220,7 +225,7 @@ for k=1:nOut
     subplot(2,nOut,k)
     imagesc(squeeze(LMSI_sim(k,:,:)))
     set(gca,'YDir','normal')
-    %colorbar    
+    %colorbar
     %xticks(1:16)
     %xticklabels(wrange)
     xticks('')
@@ -262,7 +267,9 @@ for k=1:nOut
     [~,j] = max(abs(Cstore{1,k}));
     randomEffect = zeros([TNM,WN]);
     for i=1:nIn
-        randomEffect = randomEffect + squeeze((LMSI_sim(i,:,:)*CWstore{1,k}(i,j)));
+        if ~and(i == 4, ignoreRods == 1) %, nIn == 5 % don't seem to be able to add more than 2 things to and, not important but would be nice
+            randomEffect = randomEffect + squeeze((LMSI_sim(i,:,:)*CWstore{1,k}(i,j)));
+        end
     end
     if Cstore{1,k}(1,j) < 0
         imagesc(-randomEffect)
@@ -302,7 +309,7 @@ save2pdf('C:\Users\cege-user\Dropbox\UCL\Ongoing Work\Thesis\figs\LargeSphere\ma
 
 plt_all = 0; %plot all the lines or just the best?
 
-if plt_all
+if or(plt_all,runs == 1)
     nplot = runs;
     figure('Renderer','opengl')
 else
@@ -314,14 +321,25 @@ pltcol = parula(nplot);
 
 for i=1:nOut
     subplot(1,nOut,i), hold on
-    plot([1,nOut],[0,0],'k')
-    [~,I] = maxk(Cstore{1,i},nplot);    
+    plot([1,nIn],[0,0],'k')
+    [~,I] = maxk(Cstore{1,i},nplot);
     for j=nplot:-1:1
-        plot([1,2,3],CWstore{1,1}(:,I(j)),'Color',pltcol(j,:))
+        if ignoreRods
+        plot(1:nIn-1,CWstore{1,1}([1,2,3,5],I(j)),'Color',pltcol(j,:))            
+        else
+        plot(1:nIn,CWstore{1,1}(1:nIn,I(j)),'Color',pltcol(j,:))
         %disp(Cstore{1,i}(:,I(j)))
+        end
     end
+    if ignoreRods
+        xlim([1 nIn-1])
+        xticks([1:nIn-1])
+        xticklabels({'L','M','S','I'})
+    else
     xlim([1 nIn])
+    xticks([1:nIn])
     xticklabels(labels)
+    end
     ylim([-SFM/2,SFM/2])
     yticks(ylim)
     if i ~=1
@@ -343,7 +361,45 @@ clc
 
 for i=1:nOut
     [~,I(i)] = max(Cstore{1,i});
-    a(:,i) = CWstore{1,1}(:,I(i))
+    a(:,i) = CWstore{1,1}(:,I(i));
 end
 
+%% Raincloud plot
+clear
+
+files = dir('C:\Users\cege-user\Dropbox\UCL\Data\LargeSphere\Data Analysis\mc\mc_cones*mat');
+
+for i = 1:size(files,1)
+    clear mc
+    load([files(i).folder,'\',files(i).name])
+    mcn(:,:,i) = mc; %mc-'new'
+end
+mcnr(:,:,1) = mcn(:,:,3); %reorder
+mcnr(:,:,2) = mcn(:,:,2);
+mcnr(:,:,3) = mcn(:,:,1);
+mcnr(:,:,4) = mcn(:,:,4);
+
+cols = [1,0,0;0,1,0;0,0,1;0,0,0];
+labels = {'L','M','S','R','I'};
+
+figure
+for i = 1:size(mcnr,1) % for each output
+    subplot(size(mcnr,1),1,i)
+    for j = 1:size(mcnr,3)% for each mode        
+        
+        raincloud_plot(squeeze(mcnr(i,:,j)),'alpha', 0.5,'color', cols(j,:),'cloud_edge_col', cols(j,:),'line_width',0.001);
+        ylim([-550 550])
+        % statsig(0.05)
+        % plot statsig
+%        xlim([0.7 1])
+%        
+        yticks([])
+        ylabel(labels{i})
+        %legend
+    end
+    j=1; %replot #1 because I can't be arsed to work out the proper scaling.
+    raincloud_plot(squeeze(mcnr(i,:,j)),'alpha', 0.5,'color', cols(j,:),'cloud_edge_col', cols(j,:),'line_width',0.001);    
+end
+
+ save2pdf('C:\Users\cege-user\Dropbox\UCL\Ongoing Work\Thesis\figs\LargeSphere\relcontributions')
 
