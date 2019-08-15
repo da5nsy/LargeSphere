@@ -8,13 +8,15 @@ function Large_sphere_analysis005(obs,ciedata2,xbar2,ybar2,zbar2,lambdaCie2,High
 %%able to handle all observers data.
 
 
-clc, clear, %close all
+clc, clear, close all
 
-obs='DG';   %'LM', 'TR', or 'DG'
+obs='TR';   %'LM', 'TR', or 'DG'
 
 %% Load CIE data
-ciefile = fullfile('C:','Users','ucesars','Dropbox','UCL','Data',...
-    'Colour Standards','CIE colorimetric data','CIE_colorimetric_tables.xls');
+%ciefile = fullfile('C:','Users','ucesars','Dropbox','UCL','Data',...
+%    'Colour Standards','CIE colorimetric data','CIE_colorimetric_tables.xls');
+ciefile = fullfile('C:','Users','cege-user','Dropbox','UCL','Data',...
+   'Colour Standards','CIE colorimetric data','CIE_colorimetric_tables.xls');
 
 if exist('xbar2','var')~=1
     ciedata2= xlsread(ciefile,'1931 col observer','A6:D86');
@@ -38,7 +40,8 @@ zbar2_101=interp1(lambdaCie2,zbar2,380:4:780,'spline');
 if strcmp(obs,'LM')
     rootdir = fullfile('C:','Users','ucesars','Dropbox','UCL','Data','Large Sphere','Lindsay time series - Sep 2012');
 elseif strcmp(obs,'TR')
-    rootdir = fullfile('C:','Users','ucesars','Dropbox','UCL','Data','Large Sphere','Tania  time series - Apr 2013');
+    %rootdir = fullfile('C:','Users','ucesars','Dropbox','UCL','Data','Large Sphere','Tania  time series - Apr 2013');
+    rootdir = fullfile('C:','Users','cege-user','Dropbox','UCL','Data','LargeSphere','Experimental Data','2013 Apr TR');
 elseif strcmp(obs,'DG')
     rootdir = fullfile('C:','Users','ucesars','Dropbox','UCL','Data','Large Sphere','Results - Oct 2016');
 else display('No/incorrect observer entered')
@@ -72,7 +75,9 @@ if strcmp(obs,'LM')
     %%LM run, and so we assume it is appropriate to use.
     calFileLocation = fullfile('C:','Users','ucesars','Dropbox','UCL','Data','Large Sphere','Lindsay time series - Sep 2012','LCD display measurement.mat');
 elseif strcmp(obs,'TR')
-    calFileLocation = fullfile('C:','Users','ucesars','Dropbox','UCL','Data','Large Sphere','Large LCD display measurement.mat');
+    %     calFileLocation = fullfile('C:','Users','ucesars','Dropbox','UCL','Data','Large Sphere','Large LCD display measurement.mat');
+    calFileLocation = fullfile('C:\Users\cege-user\Dropbox\UCL\Data\LargeSphere\Hardware Data\Calibration Data','Large LCD display measurement.mat');
+    
 elseif strcmp(obs,'DG')
     calFileLocation = fullfile('C:','Users','ucesars','Dropbox','UCL','Data','Large Sphere','Large LCD display measurement - Oct 2016.mat');
 else display('No/incorrect observer entered')
@@ -179,50 +184,51 @@ for trial=1:length(files)
         end
     end
 end
+
 %% Plot all data in LAB
-% figure('units','normalized','outerposition',[0 0 1 1])
-% hold on
-% axis('equal')
-% title(obs)
-% view(2)
-% LowL=30;    LL=18-LowL/5;
-% HighL=65;   HL=18-HighL/5;
-%
-% xlim([-30 30])
-% ylim([-30 30])
-% zlim([LowL-5 HighL+5])
-%
-% for i=1:length(files)
-%     %ignore un-corrected DG 480 data
-%     if strcmp(files(i).name,'480nm - time v2_3.mat')
-%     else
-%
+figure('units','normalized','outerposition',[0 0 1 1])
+hold on
+axis('equal')
+title(obs)
+view(2)
+LowL=15;    LL=18-LowL/5;
+HighL=85;   HL=18-HighL/5;
+
+%xlim([-30 30])
+%ylim([-30 30])
+zlim([LowL-5 HighL+5])
+
+for i=1:length(files)
+    %ignore un-corrected DG 480 data
+    if strcmp(files(i).name,'480nm - time v2_3.mat')
+    else
+        
+        WL=(str2num(files(i).name(1:3)));
+        LCol=xyz2rgb(ciedata2(ciedata2(:,1)==WL,2:4));
+        LCol(LCol<0)=0;LCol(LCol>1)=1;
+
 %         LABdata=squeeze(mean(files(i).dataLABcal(:,HL:LL,:),3));
-%         s=plot3(LABdata(2,:),LABdata(3,:),LABdata(1,:));
-%
-%         WL=(str2num(files(i).name(1:3)));
-%         LCol=xyz2rgb(ciedata2(ciedata2(:,1)==WL,2:4));
-%         LCol(LCol<0)=0;LCol(LCol>1)=1;
-%         s.Color=LCol;
-%
-%         %drawnow
-%         %pause(.25)
-%         xlabel('a*')
-%         ylabel('b*')
-%         zlabel('L*')
-%
-%         %LABdata=reshape(files(i).dataLABcal(:,HL:LL,:),3,(LL-HL+1)*N);
-%         %s=scatter3(LABdata(2,:),LABdata(3,:),LABdata(1,:),'r.');
-%         %s.CData=[(str2num(files(i).name(1:3))-400)/300,0,0];
-%         %s.SizeData=100;
-%         %text(LABdata(2),LABdata(3),files(i).name)
-%     end
-% end
-%
+%         plot3(LABdata(2,:),LABdata(3,:),LABdata(1,:),'Color',LCol,'DisplayName',files(i).name(1:3));
+
+        xlabel('a*')
+        ylabel('b*')
+        zlabel('L*')
+
+        LABdata=reshape(files(i).dataRGBcal(:,HL:LL,:),3,(LL-HL+1)*N);
+        s=scatter3(LABdata(2,:),LABdata(3,:),LABdata(1,:),'r.');
+        s.CData=[(str2num(files(i).name(1:3))-400)/300,0,0];
+        s.SizeData=100;
+        %text(LABdata(2),LABdata(3),files(i).name)
+    end
+end
+
 % % plot zero lines
 % currentaxes=gca;
 % plot([currentaxes.XLim],[0,0],'Color',[.8,.8,.8]);
 % plot([0,0],[currentaxes.YLim],'Color',[.8,.8,.8]);
+
+legend
+
 %% Plot all data in u'v'
 
 LowL=35;    
