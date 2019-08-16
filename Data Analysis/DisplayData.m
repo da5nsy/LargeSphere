@@ -4,8 +4,6 @@ function DisplayData(obs)
 
 %% Pre-flight
 
-%clear, clc, close all
-
 % figure defaults
 set(groot,'defaultfigureposition',[100 100 500 400]);
 set(groot,'defaultLineLineWidth',2);
@@ -14,7 +12,10 @@ set(groot,'defaultAxesFontSize',12);
 set(groot,'defaultFigureRenderer', 'painters') %renders pdfs as vectors
 set(groot,'defaultfigurecolor','white')
 
-%obs = 'TR';
+if ~exist('obs','var')
+    clear, clc, close all
+    obs = 'LM';
+end
 
 cols = jet(16);
 
@@ -133,12 +134,14 @@ subplot(2,2,2)
 hold on
 
 %ltns_all = 85:-5:10;
-ltns = [16,9,1]; %lightnesses
+%ltns = [16,9,1]; %lightnesses
+ltns = [14,6]; %lightnesses
 ltnscols = [0,0,0; 0.5,0.5,0.5;0.7,0.7,0.7];
+linestyle = {'-','--',':'};
 
 for lI = 1:length(ltns) %lightness Index
      p(lI) = plot3(squeeze(LABm(2,ltns(lI),:)),squeeze(LABm(3,ltns(lI),:)),squeeze(LABm(1,ltns(lI),:)),...
-         'Color',ltnscols(lI,:));
+         'Color',ltnscols(lI,:),'LineStyle',linestyle{lI});
     for j=1:16
         scatter3(LABm(2,ltns(lI),j),LABm(3,ltns(lI),j),LABm(1,ltns(lI),j),...
             [],cols(j,:),'filled')
@@ -146,12 +149,26 @@ for lI = 1:length(ltns) %lightness Index
 end
 
 %legend(p,split(num2str(ltns_all(ltns)))) %programmatically
-legend(p,{'10 L*','45 L*','85 L*'},'Location','best')
+%legend(p,{'10 L*','45 L*','85 L*'},'Location','best')
+legend(p,{'20 L*','60 L*'},'Location','best')
 view(2)
 xlabel('a*')
 ylabel('b*')
 zlabel('L*')
 
 save2pdf([data_folder(1:end-17),'Data Analysis\figs\',obs,'dataOverview'])
+
+%%
+
+% for k = 1:16
+%     for i=1:16
+%         for j=1:16
+%             [H(i,j,k), pValue(i,j,k)] = kstest_2s_2d(squeeze(LAB(1:2,k,:,i))', squeeze(LAB(1:2,k,:,j))');
+%         end
+%     end
+% end
+% 
+% figure, imagesc(mean(pValue,3))
+% colorbar
 
 end
