@@ -1,11 +1,9 @@
+function BaselineDataGenerator(A_SLIDER_val,B_SLIDER_val)
+
 %-------------------------------------------------------------------------
 %  VISION SPHERE EXPERIMENT - WHITE BALANCE - TIME SERIES
 %
-%  Setup Phidget Interface via USB for following I/O:
-%    Inputs from two sliders for A,B (analogue)
-%    Input from push button (digital)
-%
-%  Capture RGB matching values for single wavelength, repeated over time
+% Alternative version where I can generate baseline data (no observer)
 %
 %-------------------------------------------------------------------------
 
@@ -17,33 +15,11 @@ JOYSTICK = 0;
 
 pause on;                   % enable pausing
 
-% Initialise Phidget controller
-
-loadlibrary phidget21 phidget21Matlab.h;    % initialise Phidget library
-
-ikptr = libpointer('int32Ptr',0);
-er = calllib('phidget21','CPhidgetInterfaceKit_create',ikptr);  % set structure
-if er ~= 0
-    disp(strcat('Phidget allocation error_',sprintf('%d',er)));
-end
-ikhandle = get(ikptr, 'Value');
-
-er = calllib('phidget21','CPhidget_open',ikhandle,-1);   % open device
-if er ~= 0
-    disp(strcat('Phidget open error_',sprintf('%d',er)));
-end
-
-er = calllib('phidget21','CPhidget_waitForAttachment',ikhandle,2500);
-if er ~= 0
-    disp(strcat('Phidget attachment error_',sprintf('%d',er)));
-end
-
 %% Set up for experiment
 
-filter_lambda = 560;                       % filter wavelength
-
 %dfile = fullfile('C:','Research at UCL','Experiment','Large LCD display measurement.mat');
-dfile = fullfile('C:','Research at UCL','Experiment','Filter Spectra','Large LCD display measurement - Oct 2016.mat');
+%dfile = fullfile('C:','Research at UCL','Experiment','Filter Spectra','Large LCD display measurement - Oct 2016.mat');
+dfile = fullfile('C:\Users\cege-user\Dropbox\UCL\Data\LargeSphere\Hardware Data\Filter spectra','Large LCD display measurement - Oct 2016.mat');
 load(dfile);                        % load display data
 %Xw = 99.04; Yw = 100; Zw = 151.30;  % normalised white tristimulus for display (cool, measured)
 XYZw = XYZ(:,21,4);                  % white tristimulus values
@@ -53,7 +29,7 @@ Zw = 100*XYZw(3)/XYZw(2);            % normalised white tristimulus for display
 
 % Set up measurement panel on display
 
-px = 1295;  py = 409;  pw = 1000;  ph = 400;  % window location and dimensions
+px = 295;  py = 409;  pw = 1000;  ph = 400;  % window location and dimensions
 ph2 = floor(ph/2);  s = 8;
 pw2 = floor(pw/2);  w = 200;
 ax1 = pw2-w;  ax2 = pw2+w;              % active area
@@ -104,11 +80,10 @@ paval = -1; pbval = -1;             % initialise 'previous' state of AB sliders
 cfac = 50;                          % chroma scaling factor
 lfac = 5;                           % lightness increment
 rfac = 0.5;                         % scaling factor for random offset
-dataptr = libpointer('int32Ptr',0);
 
 %% Main loop
 
-N = 1;                             % number of repetitions over time
+N = 10;                             % number of repetitions over time
 LN = 16;                            % number of lightness levels per repeat
 LABmatch = zeros(3,LN,N,'double');  % slider values for match for each lamp
 RGBmatch = zeros(3,LN,N,'double');  % converted R,G,B values for match for each lamp
@@ -118,25 +93,23 @@ for t = 1:N                         % repeat in time
  fprintf(1,'\n--> Repetition count = %d\n',t);
  for n = 1:LN                       % repeat for each lightness level
   BUTTON_PRESSED = FALSE;           % reset state of push button
+  butval = 0;
   azval = 0.5+rfac*(rand-0.5);      % randomise zero point on scale   
   bzval = 0.5+rfac*(rand-0.5);
 
 % Get two slider settings and button status via Phidget controller
 
-  while ~BUTTON_PRESSED
-   er = calllib('phidget21','CPhidgetInterfaceKit_getSensorValue',ikhandle,A_SLIDER,dataptr);
-   araw = get(dataptr,'Value');
+  while ~BUTTON_PRESSED   
+   araw = A_SLIDER_val;
    abuf(2:5) = abuf(1:4);           % shift buffer one place
    abuf(1) = double(araw);          % save new value
    aval = mean(abuf);
-   er = calllib('phidget21','CPhidgetInterfaceKit_getSensorValue',ikhandle,B_SLIDER,dataptr);
-   braw = get(dataptr,'Value');
+   braw = B_SLIDER_val;
    bbuf(2:5) = bbuf(1:4);           % shift buffer one place
    bbuf(1) = double(braw);          % save new value
    bval = mean(bbuf);
-   er = calllib('phidget21','CPhidgetInterfaceKit_getInputState',ikhandle,BUTTON,dataptr);  
-   butval = get(dataptr,'Value');
-   if butval == ON
+   butval = butval + 1;
+   if butval > 15
     BUTTON_PRESSED = TRUE;
    else
     L = 85-lfac*(n-1);              % lightness (downward sequence)
@@ -166,8 +139,8 @@ for t = 1:N                         % repeat in time
     end
     A = cfac*(au+bu);  B = cfac*(av+bv);   % sum components
     A = A*(L/20);  B = B*(L/20);          % adjust for L level
-    [X Y Z] = LABtoXYZ(L,A,B,Xw,Yw,Zw);    % convert LAB to XYZ
-    [r g b gamutflag] = XYZtosRGBe(X/100,Y/100,Z/100); % convert to sRGB
+    [X, Y, Z] = LABtoXYZ(L,A,B,Xw,Yw,Zw);    % convert LAB to XYZ
+    [r, g, b, gamutflag] = XYZtosRGBe(X/100,Y/100,Z/100); % convert to sRGB
 
 % Update display field
 
@@ -179,15 +152,11 @@ for t = 1:N                         % repeat in time
     rbuf(:,:,3) = bb;
     dbuf(Tcircle) = rbuf(Tcircle);      % set colour in central field
     vbuf(:,ax1:ax2-1,:) = dbuf;         % update circular target
-
-    if (abs(aval-paval)>=1) || (abs(bval-pbval)>=1) % has either slider moved?
-      image(vbuf);                                  % yes, update image
-%      fprintf('Slider %3d,%3d  Rel %6.3f,%6.3f  LAB = %2d %3d %3d  RGB = %3d,%3d,%3d\n',...
-%        round(aval),round(bval),az,bz,L,round(A),round(B),rr,gg,bb);  % print out values
-%      pause(1);
-      paval = aval;  pbval = bval;                  % save current slider values
-    end
-    pause(0.05);                                    % allow time to complete
+    
+    image(vbuf);                                  % yes, update image
+    
+    paval = aval;  pbval = bval;                  % save current slider values
+    %pause(0.05);                                    % allow time to complete
    end
   end
 
@@ -198,10 +167,10 @@ for t = 1:N                         % repeat in time
   cl = clock;                          % get current time
   Tmatch(:,n,t) = cl(4:6);             % save H,M,S
   paval = -1;                          % force display update
-  pause(1);                            % wait a second to ensure button debounce
+  pause(0.2);                            % wait a second to ensure button debounce
  end
 
- fprintf(1,'\nMatching values for %d filter\n',filter_lambda);
+ fprintf(1,'\nMatching values for %d filter\n');
  for n = 1:LN
   fprintf(1,'%d LAB= %5.2f,%6.2f,%5.2f  RGB_raw = %4.2f,%4.2f,%4.2f\n',...
       n,LABmatch(:,n,t),RGBmatch(:,n,t));
@@ -222,14 +191,11 @@ for n = 1:10
 end
 
 %% Save data to text and binary files
-
-fname = sprintf('%dnm - time v2',filter_lambda);
-%fname = sprintf('NOB - time');
-filename = fullfile('C:','Test','Experiment - Oct 2016',[fname,'.txt']);
-fp = fopen(filename,'w');
+filename = ['C:\Users\cege-user\Dropbox\UCL\Data\LargeSphere\Experimental Data\BaslineData\',num2str(A_SLIDER_val),num2str(B_SLIDER_val)];
+fp = fopen([filename,'.txt'],'w');
 fprintf(fp,'Colour values for visually neutral field in sphere\n');
 fprintf(fp,'Date %d-%d-%d\n',cl(3),cl(2),cl(1));
-fprintf(fp,'\nWavelength = %d nm\n',filter_lambda);
+fprintf(fp,'\nWavelength = %d nm\n');
 %fprintf(fp,'\nNo filter (Black)');
 
 for t = 1:N
@@ -246,22 +212,10 @@ fclose(fp);
 fprintf(1,'Wrote data to file %s\n',filename);
 
 Wref = [Xw Yw Zw];
-save(fname,'Tmatch','LABmatch','RGBmatch','Wref');  % save file
+save(filename,'Tmatch','LABmatch','RGBmatch','Wref');  % save file
 
 %% End session and close Phidget interface
 
-close(fh);                    % close window
-
-er = calllib('phidget21','CPhidget_close',ikhandle);  % release Phidget structure
-if er ~= 0
-  disp(strcat('Phidget close error ',sprintf('%d',er)));
-end
-
-er = calllib('phidget21','CPhidget_delete',ikhandle);
-if er == 0
-  disp(strcat('Phidget controller released'));
-else
-  disp(strcat('Phidget delete error ',sprintf('%d',er)));
-end
-
 disp('Bye bye');
+
+end
