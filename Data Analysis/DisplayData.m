@@ -14,7 +14,7 @@ set(groot,'defaultfigurecolor','white')
 
 if ~exist('obs','var')
     clear, clc, close all
-    obs = 'baseline';
+    obs = 'LM';
 end
 
 cols = jet(16);
@@ -35,7 +35,7 @@ elseif strcmp(obs,'baseline')
     rootdir = fullfile(data_folder,'\BaselineData');
     dfile = 'C:\Users\cege-user\Dropbox\UCL\Data\LargeSphere\Hardware Data\Calibration Data\Large LCD display measurement - Oct 2016.mat'; % This is an arbitrary pick. Really I should do it with each of the dfiles listed above
 else
-    disp('No/incorrect observer entered')
+    error('No/incorrect observer entered')
 end
 
 cd(rootdir)
@@ -80,7 +80,104 @@ if strcmp(obs,'DG')
     LAB(:,:,:,[6:8]) = [];
 end
 
+%% Creates calibrated LAB values
 
+%load CIE data
+ciefile = 'C:\Users\cege-user\Dropbox\Documents\MATLAB\SmallSphere\Old (pre 20190816)\LM files\CIE colorimetric data\CIE_colorimetric_tables.xls';
+ciedata = xlsread(ciefile,'1931 col observer','A6:D86');
+% figure, plot(ciedata(:,1),ciedata(:,2),...
+%     ciedata(:,1),ciedata(:,3),
+%     ciedata(:,1),ciedata(:,4))
+% legend('show')
+cielambda=ciedata(:,1);
+Xcmf=ciedata(:,2);
+Ycmf=ciedata(:,3);
+Zcmf=ciedata(:,4);
+
+xw = zeros(length(files),1);
+yw = zeros(length(files),1);
+
+%load calibration file
+load(dfile)
+
+%interpolate recorded values (sval) to required vals (0:1:255)
+XYZinterp=zeros(3,256,4);
+for i=1:3
+    for j=1:4
+        XYZinterp(i,:,j)=interp1(sval,XYZ(i,:,j),0:255,'spline');
+    end
+end
+
+%Interp screen spectral data to same interval as CIE data
+RGBw_SPD = interp1(lambda,Measurement(:,21,4),cielambda,'spline');
+RGBb_SPD = interp1(lambda,Measurement(:,1,4),cielambda,'spline');
+
+Norm = 100/sum(RGBw_SPD.*Ycmf);              % normalising factor
+
+DB = squeeze(RGBb_SPD);
+Xb = sum(RGBb_SPD.*Xcmf)*Norm;
+Yb = sum(RGBb_SPD.*Ycmf)*Norm;               % calculate white reference
+Zb = sum(RGBb_SPD.*Zcmf)*Norm;
+
+Xw = sum(RGBw_SPD.*Xcmf)*Norm;
+Yw = sum(RGBw_SPD.*Ycmf)*Norm;               % calculate white reference
+Zw = sum(RGBw_SPD.*Zcmf)*Norm;
+xw = Xw/(Xw+Yw+Zw);
+yw = Yw/(Xw+Yw+Zw);
+
+LN = size(files(1).dataLAB,2);
+N = size(files(1).dataLAB,3);
+
+for trial=1:length(files)   
+    for j = 1:3
+        % Thresholding:
+        % - original RGB values included out of gamut
+        % selections, resulting in above 1 and below 0 values
+        
+        a = files(trial).dataRGB(j,:,:); %Create temporary variable
+        a(files(trial).dataRGB(j,:,:)>1) = 1; % Threshold to below 1
+        a(files(trial).dataRGB(j,:,:)<0) = 0; % Threshold to above 0
+        files(trial).dataRGBgam(j,:,:)   = uint8(a*255); %Rescale
+        
+        files(trial).dataRGBgamgam(j,:,:) = files(trial).dataRGB(j,:,:)>1 ...
+            |files(trial).dataRGB(j,:,:)<0; %out of gamut flag
+    end
+    
+    files(trial).dataXYZ=zeros(3,LN,N);
+    files(trial).dataxy=zeros(2,LN,N);
+    files(trial).dataLABcal=zeros(3,LN,N);
+    
+    for j=1:LN
+        for k=1:N
+            files(trial).dataXYZ(:,j,k)=...
+                (XYZinterp(:,files(trial).dataRGBgam(1,j,k)+1,1)...
+                +XYZinterp(:,files(trial).dataRGBgam(2,j,k)+1,2)...
+                +XYZinterp(:,files(trial).dataRGBgam(3,j,k)+1,3));
+            
+            files(trial).dataxy(1,j,k)=...
+                files(trial).dataXYZ(1,j,k)/sum(files(trial).dataXYZ(:,j,k));
+            files(trial).dataxy(2,j,k)=...
+                files(trial).dataXYZ(2,j,k)/sum(files(trial).dataXYZ(:,j,k));
+            
+            files(trial).dataLABcal(:,j,k)=...
+                XYZToLab(files(trial).dataXYZ(:,j,k),[Xw;Yw;Zw]);
+        end
+    end
+end
+
+% % Plot display white points
+% figure, hold on
+% drawChromaticity('1931')
+% scatter(xw,yw,'k')
+
+%%
+LAB2 = zeros(size(LAB));
+
+for i = 1:length(files)
+    LAB2(:,:,:,i) = files(i).dataLABcal;
+end
+
+LAB = LAB2;
 
 %% Basic scatter of everything
 
@@ -112,7 +209,7 @@ xlabel('a*')
 ylabel('b*')
 zlabel('L*')
 
-LABm = squeeze(mean(LAB,3));
+LABm = squeeze(median(LAB,3));
 
 for j=1:size(LAB,4)   
     p3(j) = plot3(LABm(2,:,j),LABm(3,:,j),LABm(1,:,j),'o-',...
