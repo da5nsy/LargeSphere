@@ -191,7 +191,7 @@ for n = 1:10
 end
 
 %% Save data to text and binary files
-filename = ['C:\Users\cege-user\Dropbox\UCL\Data\LargeSphere\Experimental Data\BaslineData\',num2str(A_SLIDER_val),num2str(B_SLIDER_val)];
+filename = ['C:\Users\cege-user\Dropbox\UCL\Data\LargeSphere\Experimental Data\BaselineData\',num2str(A_SLIDER_val),num2str(B_SLIDER_val)];
 fp = fopen([filename,'.txt'],'w');
 fprintf(fp,'Colour values for visually neutral field in sphere\n');
 fprintf(fp,'Date %d-%d-%d\n',cl(3),cl(2),cl(1));

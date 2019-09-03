@@ -7,20 +7,25 @@
 
 clear, clc, close all
 
-name = 'Lindsay';
-filter_lambda = 480;                  % filter wavelength
+name = 'Tania';
+filter_lambda = 540;                  % filter wavelength
 
 rootdir = fullfile('C:\Users\cege-user\Dropbox\UCL\Data\LargeSphere\Experimental Data');
 
 if strcmp(name,'Lindsay');
   fname = sprintf('%dnm - time.mat',filter_lambda);
   ifile = fullfile(rootdir,'2012 Sep LM','Lindsay time series - Sep 2012',fname);
+  dfile = 'C:\Users\cege-user\Dropbox\UCL\Data\LargeSphere\Hardware Data\Calibration Data\LCD display measurement.mat';
 elseif strcmp(name,'Tania');
   fname = sprintf('%dnm - time.mat',filter_lambda);
-  ifile = fullfile(rootdir,'2013 Apr TR',fname);
-else
+  ifile = fullfile(rootdir,'2013 Apr TR',fname);  
+  dfile = 'C:\Users\cege-user\Dropbox\UCL\Data\LargeSphere\Hardware Data\Calibration Data\Large LCD display measurement.mat';
+elseif strcmp(name,'Danny');
   fname = sprintf('%dnm - time v2_4.mat',filter_lambda);
-  ifile = fullfile(rootdir,'2016 Oct DG',fname);
+  ifile = fullfile(rootdir,'2016 Oct DG',fname);  
+  dfile = 'C:\Users\cege-user\Dropbox\UCL\Data\LargeSphere\Hardware Data\Calibration Data\Large LCD display measurement - Oct 2016.mat';
+else
+  ifile = fullfile(rootdir,'\BaselineData');  
 end
 load(ifile);                 % load experimental results for wavelength
 
@@ -28,7 +33,6 @@ N = 10;                             % number of repetitions over time
 LN = 16;                            % number of lightness levels per repeat
 
 Lval = squeeze(LABmatch(1,:,1));    % L values
-dfile = 'C:\Users\cege-user\Dropbox\UCL\Data\LargeSphere\Hardware Data\Calibration Data\Large LCD display measurement.mat';
 load(dfile);                        % load display data
 
 %% Make mosaic of matching colours - lightness vs iteration

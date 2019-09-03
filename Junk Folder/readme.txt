@@ -1,0 +1,2 @@
+This is a folder for files and folders which have become associated with this project but for no clear reason.
+I keep them rather than putting them elsewhere because since they're in the git already there's no good reason to get rid of them, and maybe perhaps I (or someone else) will work out what they are later.

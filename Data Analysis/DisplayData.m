@@ -14,7 +14,7 @@ set(groot,'defaultfigurecolor','white')
 
 if ~exist('obs','var')
     clear, clc, close all
-    obs = 'LM';
+    obs = 'baseline';
 end
 
 cols = jet(16);
@@ -23,19 +23,27 @@ cols = jet(16);
 
 data_folder = fullfile('C:','Users','cege-user','Dropbox','UCL','Data','LargeSphere','Experimental Data');
 if strcmp(obs,'LM')
-    rootdir = fullfile(data_folder,'\2012 Sep LM\Results - Sep 2012');
+    rootdir = fullfile(data_folder,'\2012 Sep LM\Results - Sep 2012');    
+    dfile = 'C:\Users\cege-user\Dropbox\UCL\Data\LargeSphere\Hardware Data\Calibration Data\LCD display measurement.mat';
 elseif strcmp(obs,'TR')
     rootdir = fullfile(data_folder,'\2013 Apr TR');
+    dfile = 'C:\Users\cege-user\Dropbox\UCL\Data\LargeSphere\Hardware Data\Calibration Data\Large LCD display measurement.mat'; % no characterisation data matching the XYZ listed in the AIC paper seems to be available. This one is close, and could potentially have been made at around the right time.
 elseif strcmp(obs,'DG')
     rootdir = fullfile(data_folder,'\2016 Oct DG');
-elseif strcmp(obs,'hyp')
-    rootdir = fullfile(data_folder,'\hypothetical_observer');
+    dfile = 'C:\Users\cege-user\Dropbox\UCL\Data\LargeSphere\Hardware Data\Calibration Data\Large LCD display measurement - Oct 2016.mat';
+elseif strcmp(obs,'baseline')
+    rootdir = fullfile(data_folder,'\BaselineData');
+    dfile = 'C:\Users\cege-user\Dropbox\UCL\Data\LargeSphere\Hardware Data\Calibration Data\Large LCD display measurement - Oct 2016.mat'; % This is an arbitrary pick. Really I should do it with each of the dfiles listed above
 else
     disp('No/incorrect observer entered')
 end
 
 cd(rootdir)
-files= dir('*nm*.mat');
+files = dir('*nm*.mat');
+if strcmp(obs,'baseline')
+    files = dir('*.mat');
+end
+    
 
 %N = 10;                             % number of repetitions over time
 %LN = 16;                            % number of lightness levels per repeat
@@ -54,22 +62,22 @@ if strcmp(obs,'LM')
     files(4) = [];
     files(5) = [];
     files(6) = [];
+    files(6) = []; % repeating numbers because each one is removed one-by-one and the rest drop back by one to fill the gap
     files(6) = [];
-    files(6) = [];
-    LAB(:,:,:,[4,6,8:10]) = []; % 4 and 7 rather than 6 because I'm doing it simultaneously
+    LAB(:,:,:,[4,6,8:10]) = []; %different number because we're removing them simultaneously
 end
 
 if strcmp(obs,'TR')
     files(4) = [];
     files(6) = [];
-    LAB(:,:,:,[4,7]) = []; % 4 and 7 rather than 6 because I'm doing it simultaneously
+    LAB(:,:,:,[4,7]) = [];
 end
 
 if strcmp(obs,'DG')
     files(6) = [];
     files(6) = [];
     files(6) = [];
-    LAB(:,:,:,[6:8]) = []; % 4 and 7 rather than 6 because I'm doing it simultaneously
+    LAB(:,:,:,[6:8]) = [];
 end
 
 
@@ -87,8 +95,8 @@ zlabel('L*')
 
 cla
 
-for j=1:16
-    for i=1:10
+for j=1:size(LAB,4)
+    for i=1:size(LAB,3)
         plot3(LAB(2,:,i,j),LAB(3,:,i,j),LAB(1,:,i,j),'Color',cols(j,:))
     end
 end
@@ -106,7 +114,7 @@ zlabel('L*')
 
 LABm = squeeze(mean(LAB,3));
 
-for j=1:16    
+for j=1:size(LAB,4)   
     p3(j) = plot3(LABm(2,:,j),LABm(3,:,j),LABm(1,:,j),'o-',...
         'Color',cols(j,:),'DisplayName',files(j).name(1:5));    
 end
@@ -142,7 +150,7 @@ linestyle = {'-','--',':'};
 for lI = 1:length(ltns) %lightness Index
      p(lI) = plot3(squeeze(LABm(2,ltns(lI),:)),squeeze(LABm(3,ltns(lI),:)),squeeze(LABm(1,ltns(lI),:)),...
          'Color',ltnscols(lI,:),'LineStyle',linestyle{lI});
-    for j=1:16
+    for j=1:size(LAB,4)
         scatter3(LABm(2,ltns(lI),j),LABm(3,ltns(lI),j),LABm(1,ltns(lI),j),...
             [],cols(j,:),'filled')
     end
@@ -156,7 +164,7 @@ xlabel('a*')
 ylabel('b*')
 zlabel('L*')
 
-save2pdf([data_folder(1:end-17),'Data Analysis\figs\',obs,'dataOverview'])
+%save2pdf([data_folder(1:end-17),'Data Analysis\figs\',obs,'dataOverview'])
 
 %%
 

@@ -91,7 +91,7 @@ BUTTON = 1;                         % button input assignment
 % Define constants for interaction
 
 ur =  25;  uy = 92;                 % CIELAB unique hues for R,Y,G,B (degrees)
-ug = 163;  ub = 253;                % (Derefeldt et al, 2007, CR&A 11(2)148-152)
+ug = 163;  ub = 253;                % (Derefeldt et al, 1986, CR&A 11(2)148-152)
 sur = sind(ur);  cur = cosd(ur);
 suy = sind(uy);  cuy = cosd(uy);
 sug = sind(ug);  cug = cosd(ug);
