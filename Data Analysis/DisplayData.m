@@ -5,12 +5,7 @@ function DisplayData(obs)
 %% Pre-flight
 
 % figure defaults
-set(groot,'defaultfigureposition',[100 100 500 400]);
-set(groot,'defaultLineLineWidth',2);
-set(groot,'defaultAxesFontName', 'Courier');
-set(groot,'defaultAxesFontSize',12);
-set(groot,'defaultFigureRenderer', 'painters') %renders pdfs as vectors
-set(groot,'defaultfigurecolor','white')
+DGdisplaydefaults;
 
 if ~exist('obs','var')
     clear, clc, close all
@@ -44,17 +39,17 @@ if strcmp(obs,'baseline')
     files = dir('*.mat');
 end
     
-
-%N = 10;                             % number of repetitions over time
-%LN = 16;                            % number of lightness levels per repeat
-
 for j=1:length(files)    
     load(fullfile(rootdir,files(j).name));  % load experimental results
     files(j).dataLAB = LABmatch;
-    LAB(:,:,:,j) = LABmatch;
+    %LAB(:,:,:,j) = LABmatch;
     files(j).dataRGB = RGBmatch;
     files(j).Tmatch  = Tmatch;    
 end
+
+LN = size(files(1).dataLAB,2);      % number of lightness levels per repeat
+N = size(files(1).dataLAB,3);       % number of repetitions over time
+
 
 %% Remove repeats
 
@@ -64,120 +59,96 @@ if strcmp(obs,'LM')
     files(6) = [];
     files(6) = []; % repeating numbers because each one is removed one-by-one and the rest drop back by one to fill the gap
     files(6) = [];
-    LAB(:,:,:,[4,6,8:10]) = []; %different number because we're removing them simultaneously
+    %LAB(:,:,:,[4,6,8:10]) = []; %different number because we're removing them simultaneously
 end
 
 if strcmp(obs,'TR')
     files(4) = [];
     files(6) = [];
-    LAB(:,:,:,[4,7]) = [];
+    %LAB(:,:,:,[4,7]) = [];
 end
 
 if strcmp(obs,'DG')
     files(6) = [];
     files(6) = [];
     files(6) = [];
-    LAB(:,:,:,[6:8]) = [];
+    %LAB(:,:,:,6:8) = [];
 end
 
 %% Creates calibrated LAB values
 
-%load CIE data
-ciefile = 'C:\Users\cege-user\Dropbox\Documents\MATLAB\SmallSphere\Old (pre 20190816)\LM files\CIE colorimetric data\CIE_colorimetric_tables.xls';
-ciedata = xlsread(ciefile,'1931 col observer','A6:D86');
-% figure, plot(ciedata(:,1),ciedata(:,2),...
-%     ciedata(:,1),ciedata(:,3),
-%     ciedata(:,1),ciedata(:,4))
-% legend('show')
-cielambda=ciedata(:,1);
-Xcmf=ciedata(:,2);
-Ycmf=ciedata(:,3);
-Zcmf=ciedata(:,4);
-
-xw = zeros(length(files),1);
-yw = zeros(length(files),1);
-
 %load calibration file
-load(dfile)
+load(dfile,'sval','XYZ')
 
 %interpolate recorded values (sval) to required vals (0:1:255)
 XYZinterp=zeros(3,256,4);
+% figure, hold on
 for i=1:3
     for j=1:4
-        XYZinterp(i,:,j)=interp1(sval,XYZ(i,:,j),0:255,'spline');
+        XYZinterp(i,:,j) = interp1(sval, XYZ(i,:,j), 0:255, 'spline');
+%         plot(sval, XYZ(i,:,j),'o')        % check interpolation 
+%         plot(0:255, XYZinterp(i,:,j))
     end
 end
 
-%Interp screen spectral data to same interval as CIE data
-RGBw_SPD = interp1(lambda,Measurement(:,21,4),cielambda,'spline');
-RGBb_SPD = interp1(lambda,Measurement(:,1,4),cielambda,'spline');
+% Calcaulate XYZ for white point of display
+%   This method gives slightly different results to the previous method
+%   (where cie1931 was loaded, and fresh tristimulus were calculated from
+%   the recorded spectra, but this method is much neater and in-ilne with
+%   the use of the PR650 XYZ values elsewhere).
 
-Norm = 100/sum(RGBw_SPD.*Ycmf);              % normalising factor
+XYZw = XYZ(:,end,4)/XYZ(2,end,4)*100;
 
-DB = squeeze(RGBb_SPD);
-Xb = sum(RGBb_SPD.*Xcmf)*Norm;
-Yb = sum(RGBb_SPD.*Ycmf)*Norm;               % calculate white reference
-Zb = sum(RGBb_SPD.*Zcmf)*Norm;
+for trial = 1:length(files)   
 
-Xw = sum(RGBw_SPD.*Xcmf)*Norm;
-Yw = sum(RGBw_SPD.*Ycmf)*Norm;               % calculate white reference
-Zw = sum(RGBw_SPD.*Zcmf)*Norm;
-xw = Xw/(Xw+Yw+Zw);
-yw = Yw/(Xw+Yw+Zw);
-
-LN = size(files(1).dataLAB,2);
-N = size(files(1).dataLAB,3);
-
-for trial=1:length(files)   
-    for j = 1:3
-        % Thresholding:
-        % - original RGB values included out of gamut
-        % selections, resulting in above 1 and below 0 values
-        
-        a = files(trial).dataRGB(j,:,:); %Create temporary variable
-        a(files(trial).dataRGB(j,:,:)>1) = 1; % Threshold to below 1
-        a(files(trial).dataRGB(j,:,:)<0) = 0; % Threshold to above 0
-        files(trial).dataRGBgam(j,:,:)   = uint8(a*255); %Rescale
-        
-        files(trial).dataRGBgamgam(j,:,:) = files(trial).dataRGB(j,:,:)>1 ...
-            |files(trial).dataRGB(j,:,:)<0; %out of gamut flag
-    end
+    % Thresholding:
+    %   Original RGB values included out of gamut (sRGB)
+    %   selections, resulting in above 1 and below 0 values. These would
+    %   actually have only presented values at 0/1 and so here they are
+    %   corrected to represent what would actually have been presented    
     
-    files(trial).dataXYZ=zeros(3,LN,N);
-    files(trial).dataxy=zeros(2,LN,N);
-    files(trial).dataLABcal=zeros(3,LN,N);
+    files(trial).dataRGBgamflag = files(trial).dataRGB > 1 | files(trial).dataRGB < 0; %out of gamut flag
     
-    for j=1:LN
-        for k=1:N
-            files(trial).dataXYZ(:,j,k)=...
-                (XYZinterp(:,files(trial).dataRGBgam(1,j,k)+1,1)...
-                +XYZinterp(:,files(trial).dataRGBgam(2,j,k)+1,2)...
-                +XYZinterp(:,files(trial).dataRGBgam(3,j,k)+1,3));
+    files(trial).dataRGBgamcor  = files(trial).dataRGB; %duplicate
+    files(trial).dataRGBgamcor(files(trial).dataRGB < 0) = 0;
+    files(trial).dataRGBgamcor(files(trial).dataRGB > 1) = 1;
+    
+    % Quantization
+    files(trial).dataRGBgamcor = uint8(files(trial).dataRGBgamcor*255);
+    
+    files(trial).dataXYZcal    = zeros(3,LN,N);
+    files(trial).dataxycal     = zeros(2,LN,N);
+    files(trial).dataLABcal    = zeros(3,LN,N);
+    
+    for j = 1:LN
+        for k = 1:N
+            files(trial).dataXYZcal(:,j,k) = ...
+                (XYZinterp(:,files(trial).dataRGBgamcor(1,j,k)+1,1)...
+                +XYZinterp(:,files(trial).dataRGBgamcor(2,j,k)+1,2)...
+                +XYZinterp(:,files(trial).dataRGBgamcor(3,j,k)+1,3));
             
-            files(trial).dataxy(1,j,k)=...
-                files(trial).dataXYZ(1,j,k)/sum(files(trial).dataXYZ(:,j,k));
-            files(trial).dataxy(2,j,k)=...
-                files(trial).dataXYZ(2,j,k)/sum(files(trial).dataXYZ(:,j,k));
+            files(trial).dataxycal(1,j,k)=...
+                files(trial).dataXYZcal(1,j,k)/sum(files(trial).dataXYZcal(:,j,k));
+            files(trial).dataxycal(2,j,k)=...
+                files(trial).dataXYZcal(2,j,k)/sum(files(trial).dataXYZcal(:,j,k));
             
             files(trial).dataLABcal(:,j,k)=...
-                XYZToLab(files(trial).dataXYZ(:,j,k),[Xw;Yw;Zw]);
+                XYZToLab(files(trial).dataXYZcal(:,j,k),XYZw);
         end
     end
 end
 
 % % Plot display white points
-% figure, hold on
-% drawChromaticity('1931')
-% scatter(xw,yw,'k')
+figure, hold on
+drawChromaticity
+scatter(XYZw(1)/sum(XYZw),XYZw(2)/sum(XYZw),'k')
 
 %%
-LAB2 = zeros(size(LAB));
 
 for i = 1:length(files)
-    LAB2(:,:,:,i) = files(i).dataLABcal;
+    LAB(:,:,:,i) = files(i).dataLABcal;
 end
 
-LAB = LAB2;
 
 %% Basic scatter of everything
 
