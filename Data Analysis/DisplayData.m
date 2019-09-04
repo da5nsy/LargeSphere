@@ -9,7 +9,7 @@ DGdisplaydefaults;
 
 if ~exist('obs','var')
     clear, clc, close all
-    obs = 'LM';
+    obs = 'baseline';
 end
 
 cols = jet(16);
@@ -143,7 +143,7 @@ figure, hold on
 drawChromaticity
 scatter(XYZw(1)/sum(XYZw),XYZw(2)/sum(XYZw),'k')
 
-%%
+%% Grab LABcal values out for easier plotting
 
 for i = 1:length(files)
     LAB(:,:,:,i) = files(i).dataLABcal;
@@ -162,11 +162,20 @@ zlabel('L*')
 %% Grouped by repeat and wavelength
 
 cla
+bcol = lines(5);
 
 for j=1:size(LAB,4)
     for i=1:size(LAB,3)
-        plot3(LAB(2,:,i,j),LAB(3,:,i,j),LAB(1,:,i,j),'Color',cols(j,:))
+        if ~strcmp(obs,'baseline')
+            plot3(LAB(2,:,i,j),LAB(3,:,i,j),LAB(1,:,i,j),'Color',cols(j,:))
+        else
+            plot3(LAB(2,:,i,j),LAB(3,:,i,j),LAB(1,:,i,j),'--','Color',bcol(ceil(j/5),:))
+        end
     end
+end
+
+if strcmp(obs,'baseline') %end the function here
+    return
 end
 
 %% Grouped by wavelength, averaged over repeats

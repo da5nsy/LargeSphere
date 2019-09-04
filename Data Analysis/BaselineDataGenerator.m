@@ -1,4 +1,4 @@
-function BaselineDataGenerator(A_SLIDER_val,B_SLIDER_val)
+function BaselineDataGenerator(A_SLIDER_val,B_SLIDER_val,azval,bzval)
 
 %-------------------------------------------------------------------------
 %  VISION SPHERE EXPERIMENT - WHITE BALANCE - TIME SERIES
@@ -9,7 +9,6 @@ function BaselineDataGenerator(A_SLIDER_val,B_SLIDER_val)
 
 % Define data values
 
-ON = 1;  OFF = 0;
 TRUE = 1;  FALSE = 0;
 JOYSTICK = 0;
 
@@ -19,7 +18,7 @@ pause on;                   % enable pausing
 
 %dfile = fullfile('C:','Research at UCL','Experiment','Large LCD display measurement.mat');
 %dfile = fullfile('C:','Research at UCL','Experiment','Filter Spectra','Large LCD display measurement - Oct 2016.mat');
-dfile = fullfile('C:\Users\cege-user\Dropbox\UCL\Data\LargeSphere\Hardware Data\Filter spectra','Large LCD display measurement - Oct 2016.mat');
+dfile = fullfile('C:\Users\cege-user\Dropbox\UCL\Data\LargeSphere\Hardware Data\Calibration Data','Large LCD display measurement - Oct 2016.mat');
 load(dfile);                        % load display data
 %Xw = 99.04; Yw = 100; Zw = 151.30;  % normalised white tristimulus for display (cool, measured)
 XYZw = XYZ(:,21,4);                  % white tristimulus values
@@ -43,7 +42,9 @@ rad = 100;                              % radius of circular target
 for i = 1:pw
   for j = 1:ph
     r = sqrt((ph2-i)^2+(ph2-j)^2);      % distance from centre
-    if (r<=rad) tbuf(j,i,:) = 1; end    % 1 inside circle
+    if (r<=rad) 
+        tbuf(j,i,:) = 1; 
+    end    % 1 inside circle
   end
 end
 Tcircle = (tbuf==1);                    % logical 'true' inside circle
@@ -83,7 +84,7 @@ rfac = 0.5;                         % scaling factor for random offset
 
 %% Main loop
 
-N = 10;                             % number of repetitions over time
+N = 1;                             % number of repetitions over time
 LN = 16;                            % number of lightness levels per repeat
 LABmatch = zeros(3,LN,N,'double');  % slider values for match for each lamp
 RGBmatch = zeros(3,LN,N,'double');  % converted R,G,B values for match for each lamp
@@ -94,8 +95,8 @@ for t = 1:N                         % repeat in time
  for n = 1:LN                       % repeat for each lightness level
   BUTTON_PRESSED = FALSE;           % reset state of push button
   butval = 0;
-  azval = 0.5+rfac*(rand-0.5);      % randomise zero point on scale   
-  bzval = 0.5+rfac*(rand-0.5);
+%   azval = 0.5+rfac*(rand-0.5);      % randomise zero point on scale   
+%   bzval = 0.5+rfac*(rand-0.5);
 
 % Get two slider settings and button status via Phidget controller
 
@@ -167,7 +168,7 @@ for t = 1:N                         % repeat in time
   cl = clock;                          % get current time
   Tmatch(:,n,t) = cl(4:6);             % save H,M,S
   paval = -1;                          % force display update
-  pause(0.2);                            % wait a second to ensure button debounce
+  pause(0.01);                            % wait a second to ensure button debounce
  end
 
  fprintf(1,'\nMatching values for %d filter\n');
@@ -182,16 +183,16 @@ end
 for n = 1:10
   vbuf(:,:,:) = floor(150*n/10);
   image(vbuf);           % ramp display up
-  pause(0.05);
+  pause(0.01);
 end
 for n = 1:10
   vbuf(:,:,:) = floor(150*(10-n)/10);
   image(vbuf);           % ramp display down
-  pause(0.05);
+  pause(0.01);
 end
 
 %% Save data to text and binary files
-filename = ['C:\Users\cege-user\Dropbox\UCL\Data\LargeSphere\Experimental Data\BaselineData\',num2str(A_SLIDER_val),num2str(B_SLIDER_val)];
+filename = ['C:\Users\cege-user\Dropbox\UCL\Data\LargeSphere\Experimental Data\BaselineData\',num2str(A_SLIDER_val),'-',num2str(B_SLIDER_val),'-',num2str(azval*100),'-',num2str(bzval*100)]; %*100 to avoid decimal places in filenames #hacky
 fp = fopen([filename,'.txt'],'w');
 fprintf(fp,'Colour values for visually neutral field in sphere\n');
 fprintf(fp,'Date %d-%d-%d\n',cl(3),cl(2),cl(1));
