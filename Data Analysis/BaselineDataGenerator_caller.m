@@ -6,6 +6,10 @@ clear, clc, close all
 
 slider_vals = ...
        [500,    500;
+        500,    1000;
+        500,    0;
+        1000,   500;
+        0,      500;
         0,      0;
         1000,   0;
         0,      1000;
@@ -20,10 +24,11 @@ current_centres = ...
     
 %%
 
-for sv = 1:5
-    for cc = 1:5
+for sv = 1:length(slider_vals)
+    for cc = 1:length(current_centres)
         BaselineDataGenerator(slider_vals(sv,1),slider_vals(sv,2),current_centres(cc,1),current_centres(cc,2));
     end
+    close all
 end
 
     

@@ -9,12 +9,12 @@ DGdisplaydefaults;
 
 if ~exist('obs','var')
     clear, clc, close all
-    obs = 'LM';
+    obs = 'baseline';
 end
 
 cs = 'LAB'; %colour space, for plotting
 cols = jet(16);
-bcol = lines(5);
+bcol = lines(9);
 
 %% Load Data
 
@@ -206,8 +206,13 @@ end
 
 figure('Position',[100 100 1000 800])
 hold on
-subplot(2,2,1)
-hold on
+if strcmp(obs,'baseline')
+    subplot(2,2,1:2)
+    hold on
+else
+    subplot(2,2,1)
+    hold on
+end
 
 if strcmp(cs,'xyY')
     xlabel('x')
@@ -277,13 +282,13 @@ elseif strcmp(cs,'LAB')
     
     LABm = squeeze(median(LAB,3));
     
-    t = [3,8,13,18,23];
+    t = 3:5:length(files); %[3,8,13,18,23];
     if strcmp(obs,'baseline')
         for j=1:length(t)%1:size(LAB,4)
             p3(j) = plot3(LABm(2,:,t(j)),LABm(3,:,t(j)),LABm(1,:,t(j)),'o-',...
-                'Color',bcol(ceil(t(j)/5),:));
+                'Color',bcol(ceil(t(j)/5),:),'DisplayName',files(t(j)).name(1:end-10));
         end
-        %legend('Location','westoutside')
+        legend('Location','westoutside')
     else
         for j=1:size(LAB,4)
             p3(j) = plot3(LABm(2,:,j),LABm(3,:,j),LABm(1,:,j),'o-',...
@@ -329,8 +334,10 @@ elseif strcmp(cs,'LAB')
         cleanTicks
     end
     
-    subplot(2,2,2)
-    hold on
+    if ~strcmp(obs,'baseline')
+        subplot(2,2,2)
+        hold on
+    end
     
     %ltns_all = 85:-5:10;
     %ltns = [16,9,1]; %lightnesses
@@ -340,22 +347,27 @@ elseif strcmp(cs,'LAB')
     
     for lI = 1:length(ltns) %lightness Index
         if strcmp(obs,'baseline')
-            for j = [3,8,13,18,23,3]
-                for i = [-2,-1,1,2]
-                    p(lI) = plot3([LABm(2,ltns(lI),j),LABm(2,ltns(lI),j+i)],[LABm(3,ltns(lI),j),LABm(3,ltns(lI),j+i)],[LABm(1,ltns(lI),j),LABm(1,ltns(lI),j+i)],...
-                        'Color',ltnscols(lI,:),'LineStyle',linestyle{lI});
-                end
-            end
-            %legend(p,{'20 L*','60 L*'},'Location','best')
-            xlim([-100 100])
-            ylim([-100 100])
-            zlim([0 100])
-            axis equal
-            cleanTicks
-            for j=1:size(LAB,4)
-                scatter3(LABm(2,ltns(lI),j),LABm(3,ltns(lI),j),LABm(1,ltns(lI),j),...
-                    [],bcol(ceil(j/5),:),'filled')
-            end
+%             lI = 2;
+%             for j = [t,t(1)] %repeat initial (central)
+%                 for i = [-2,-1,1,2]
+%                     p(lI) = plot3([LABm(2,ltns(lI),j),LABm(2,ltns(lI),j+i)],[LABm(3,ltns(lI),j),LABm(3,ltns(lI),j+i)],[LABm(1,ltns(lI),j),LABm(1,ltns(lI),j+i)],...
+%                         'Color',ltnscols(lI,:),'LineStyle',linestyle{lI});
+%                 end
+%             end
+%             legend(p,{'20 L*','60 L*'},'Location','best')
+%             xlim([-100 100])
+%             ylim([-100 100])
+%             zlim([0 100])
+%             axis equal
+%             cleanTicks
+%             for j=1:size(LAB,4)
+%                 scatter3(LABm(2,ltns(lI),j),LABm(3,ltns(lI),j),LABm(1,ltns(lI),j),...
+%                     [],bcol(ceil(j/5),:),'filled')
+%             end
+%             view(2)
+%             xlabel('a*')
+%             ylabel('b*')
+%             zlabel('L*')
         else
             p(lI) = plot3(squeeze(LABm(2,ltns(lI),:)),squeeze(LABm(3,ltns(lI),:)),squeeze(LABm(1,ltns(lI),:)),...
                 'Color',ltnscols(lI,:),'LineStyle',linestyle{lI});
@@ -366,14 +378,12 @@ elseif strcmp(cs,'LAB')
                 scatter3(LABm(2,ltns(lI),j),LABm(3,ltns(lI),j),LABm(1,ltns(lI),j),...
                     [],cols(j,:),'filled')
             end
+            view(2)
+            xlabel('a*')
+            ylabel('b*')
+            zlabel('L*')
         end
-        
     end
-    
-    view(2)
-    xlabel('a*')
-    ylabel('b*')
-    zlabel('L*')
 end
 
 save2pdf([data_folder(1:end-17),'Data Analysis\figs\',obs,'dataOverview'])
