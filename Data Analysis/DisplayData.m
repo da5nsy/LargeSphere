@@ -9,17 +9,18 @@ DGdisplaydefaults;
 
 if ~exist('obs','var')
     clear, clc, close all
-    obs = 'LM';
+    obs = 'baseline';
 end
 
-cs = 'xyY'; %colour space, for plotting
+cs = 'LAB'; %colour space, for plotting
 cols = jet(16);
+bcol = lines(5);
 
 %% Load Data
 
 data_folder = fullfile('C:','Users','cege-user','Dropbox','UCL','Data','LargeSphere','Experimental Data');
 if strcmp(obs,'LM')
-    rootdir = fullfile(data_folder,'\2012 Sep LM\Results - Sep 2012');    
+    rootdir = fullfile(data_folder,'\2012 Sep LM\Results - Sep 2012');
     dfile = 'C:\Users\cege-user\Dropbox\UCL\Data\LargeSphere\Hardware Data\Calibration Data\LCD display measurement.mat';
 elseif strcmp(obs,'TR')
     rootdir = fullfile(data_folder,'\2013 Apr TR');
@@ -39,13 +40,13 @@ files = dir('*nm*.mat');
 if strcmp(obs,'baseline')
     files = dir('*.mat');
 end
-    
-for j=1:length(files)    
+
+for j=1:length(files)
     load(fullfile(rootdir,files(j).name));  % load experimental results
     files(j).dataLAB = LABmatch;
     %LAB(:,:,:,j) = LABmatch;
     files(j).dataRGB = RGBmatch;
-    files(j).Tmatch  = Tmatch;    
+    files(j).Tmatch  = Tmatch;
 end
 
 LN = size(files(1).dataLAB,2);      % number of lightness levels per repeat
@@ -87,8 +88,8 @@ XYZinterp=zeros(3,256,4);
 for i=1:3
     for j=1:4
         XYZinterp(i,:,j) = interp1(sval, XYZ(i,:,j), 0:255, 'spline');
-%         plot(sval, XYZ(i,:,j),'o')        % check interpolation 
-%         plot(0:255, XYZinterp(i,:,j))
+        %         plot(sval, XYZ(i,:,j),'o')        % check interpolation
+        %         plot(0:255, XYZinterp(i,:,j))
     end
 end
 
@@ -100,13 +101,13 @@ end
 
 XYZw = XYZ(:,end,4)/XYZ(2,end,4)*100;
 
-for trial = 1:length(files)   
-
+for trial = 1:length(files)
+    
     % Thresholding:
     %   Original RGB values included out of gamut (sRGB)
     %   selections, resulting in above 1 and below 0 values. These would
     %   actually have only presented values at 0/1 and so here they are
-    %   corrected to represent what would actually have been presented    
+    %   corrected to represent what would actually have been presented
     
     files(trial).dataRGBgamflag = files(trial).dataRGB > 1 | files(trial).dataRGB < 0; %out of gamut flag
     
@@ -163,7 +164,7 @@ if strcmp(cs,'LAB')
     ylabel('b*')
     zlabel('L*')
     
-elseif strcmp(cs,'xyY')    
+elseif strcmp(cs,'xyY')
     figure, hold on
     drawChromaticity
     scatter3(xyY(1,:),xyY(2,:),xyY(3,:),'.') %how would I add colour to this?
@@ -176,7 +177,6 @@ end
 %% Grouped by repeat and wavelength
 
 cla
-bcol = lines(5);
 
 if strcmp(cs,'LAB')
     for j = 1:size(LAB,4)
@@ -202,10 +202,6 @@ elseif strcmp(cs,'xyY')
     end
 end
 
-if strcmp(obs,'baseline') %end the function here
-    return
-end
-
 %% Grouped by wavelength, averaged over repeats
 
 figure('Position',[100 100 1000 800])
@@ -213,132 +209,140 @@ hold on
 subplot(2,2,1)
 hold on
 
-xlabel('x')
-ylabel('y')
-zlabel('Y')
-
-xyYm = squeeze(median(xyY,3));
-
-for j=1:size(xyY,4)   
-    p3(j) = plot3(xyYm(1,:,j),xyYm(2,:,j),xyYm(3,:,j),'o-',...
-        'Color',cols(j,:),'DisplayName',files(j).name(1:5));    
-end
-
-view(2)
-legend('Location','westoutside')
-
-s2 = subplot(2,2,3);
-xlabel('x')
-ylabel('y')
-zlabel('Y')
-copyobj(p3,s2);
-view(0,0)
-
-s3 = subplot(2,2,4);
-xlabel('x')
-ylabel('y')
-zlabel('Y')
-copyobj(p3,s3);
-view(90,0)
-
-
-%% Select Lstar
-subplot(2,2,2)
-hold on
-
-%ltns_all = 85:-5:10;
-%ltns = [16,9,1]; %lightnesses
-ltns = [14,6]; %lightnesses
-ltnscols = [0,0,0; 0.5,0.5,0.5;0.7,0.7,0.7];
-linestyle = {'-','--',':'};
-
-for lI = 1:length(ltns) %lightness Index
-     p(lI) = plot3(squeeze(xyYm(1,ltns(lI),:)),squeeze(xyYm(2,ltns(lI),:)),squeeze(xyYm(3,ltns(lI),:)),...
-         'Color',ltnscols(lI,:),'LineStyle',linestyle{lI});
-    for j=1:size(LAB,4)
-        scatter3(xyYm(1,ltns(lI),j),xyYm(2,ltns(lI),j),xyYm(3,ltns(lI),j),...
-            [],cols(j,:),'filled')
+if strcmp(cs,'xyY')
+    xlabel('x')
+    ylabel('y')
+    zlabel('Y')
+    
+    xyYm = squeeze(median(xyY,3));
+    
+    for j=1:size(xyY,4)
+        p3(j) = plot3(xyYm(1,:,j),xyYm(2,:,j),xyYm(3,:,j),'o-',...
+            'Color',cols(j,:),'DisplayName',files(j).name(1:5));
+        daspect([1,1,150])
     end
+    
+    view(2)
+    legend('Location','westoutside')
+    
+    s2 = subplot(2,2,3);
+    xlabel('x')
+    ylabel('y')
+    zlabel('Y')
+    copyobj(p3,s2);
+    view(0,0)
+    
+    s3 = subplot(2,2,4);
+    xlabel('x')
+    ylabel('y')
+    zlabel('Y')
+    copyobj(p3,s3);
+    view(90,0)
+    
+    subplot(2,2,2)
+    hold on
+    
+    %ltns_all = 85:-5:10;
+    %ltns = [16,9,1]; %lightnesses
+    ltns = [14,6]; %lightnesses
+    ltnscols = [0,0,0; 0.5,0.5,0.5;0.7,0.7,0.7];
+    linestyle = {'-','--',':'};
+    
+    for lI = 1:length(ltns) %lightness Index
+        p(lI) = plot3(squeeze(xyYm(1,ltns(lI),:)),squeeze(xyYm(2,ltns(lI),:)),squeeze(xyYm(3,ltns(lI),:)),...
+            'Color',ltnscols(lI,:),'LineStyle',linestyle{lI});
+        for j=1:size(LAB,4)
+            scatter3(xyYm(1,ltns(lI),j),xyYm(2,ltns(lI),j),xyYm(3,ltns(lI),j),...
+                [],cols(j,:),'filled')
+        end
+    end
+    
+    % averaging option
+    %p = plot3(squeeze(mean(xyYm(1,6:14,:),2)),squeeze(mean(xyYm(2,6:14,:),2)),squeeze(mean(xyYm(3,6:14,:),2)),'k');
+    
+    
+    %legend(p,split(num2str(ltns_all(ltns)))) %programmatically
+    %legend(p,{'10 L*','45 L*','85 L*'},'Location','best')
+    %legend(p,{'20 L*','60 L*'},'Location','best')
+    view(2)
+    xlabel('x')
+    ylabel('y')
+    zlabel('Y')
+    
+elseif strcmp(cs,'LAB')
+    
+    xlabel('a*')
+    ylabel('b*')
+    zlabel('L*')
+    
+    LABm = squeeze(median(LAB,3));
+    
+    if strcmp(obs,'baseline')
+        for j=1:size(LAB,4)
+            p3(j) = plot3(LABm(2,:,j),LABm(3,:,j),LABm(1,:,j),'o-',...
+                'Color',bcol(ceil(j/5),:),'DisplayName',files(j).name(1:5));
+        end
+    else
+        for j=1:size(LAB,4)
+            p3(j) = plot3(LABm(2,:,j),LABm(3,:,j),LABm(1,:,j),'o-',...
+                'Color',cols(j,:),'DisplayName',files(j).name(1:5));
+        end
+        legend('Location','westoutside')
+    end
+    
+    view(2)
+    
+    s2 = subplot(2,2,3);
+    xlabel('a*')
+    ylabel('b*')
+    zlabel('L*')
+    copyobj(p3,s2);
+    view(0,0)
+    
+    s3 = subplot(2,2,4);
+    xlabel('a*')
+    ylabel('b*')
+    zlabel('L*')
+    copyobj(p3,s3);
+    view(90,0)
+    
+    subplot(2,2,2)
+    hold on
+    
+    %ltns_all = 85:-5:10;
+    %ltns = [16,9,1]; %lightnesses
+    ltns = [14,6]; %lightnesses
+    ltnscols = [0,0,0; 0.5,0.5,0.5;0.7,0.7,0.7];
+    linestyle = {'-','--',':'};
+    
+    for lI = 1:length(ltns) %lightness Index
+        if strcmp(obs,'baseline')
+            for j = [1,6,11,16,21,1]
+                for i = 1:4
+                    p(lI) = plot3([LABm(2,ltns(lI),j),LABm(2,ltns(lI),j+i)],[LABm(3,ltns(lI),j),LABm(3,ltns(lI),j+i)],[LABm(1,ltns(lI),j),LABm(1,ltns(lI),j+i)],...
+                        'Color',ltnscols(lI,:),'LineStyle',linestyle{lI});
+                end
+            end
+        else
+            p(lI) = plot3(squeeze(LABm(2,ltns(lI),:)),squeeze(LABm(3,ltns(lI),:)),squeeze(LABm(1,ltns(lI),:)),...
+                'Color',ltnscols(lI,:),'LineStyle',linestyle{lI});
+        end
+        for j=1:size(LAB,4)
+            scatter3(LABm(2,ltns(lI),j),LABm(3,ltns(lI),j),LABm(1,ltns(lI),j),...
+                [],bcol(ceil(j/5),:),'filled')
+        end
+    end
+    
+    %legend(p,split(num2str(ltns_all(ltns)))) %programmatically
+    %legend(p,{'10 L*','45 L*','85 L*'},'Location','best')
+    legend(p,{'20 L*','60 L*'},'Location','best')
+    view(2)
+    xlabel('a*')
+    ylabel('b*')
+    zlabel('L*')
 end
 
-
-p = plot3(squeeze(mean(xyYm(1,6:14,:),2)),squeeze(mean(xyYm(2,6:14,:),2)),squeeze(mean(xyYm(3,6:14,:),2)),'k');
-
-
-%legend(p,split(num2str(ltns_all(ltns)))) %programmatically
-%legend(p,{'10 L*','45 L*','85 L*'},'Location','best')
-%legend(p,{'20 L*','60 L*'},'Location','best')
-view(2)
-xlabel('x')
-ylabel('y')
-zlabel('Y')
-
-%%
-
-% %% Grouped by wavelength, averaged over repeats
-% 
-% figure('Position',[100 100 1000 800])
-% hold on
-% subplot(2,2,1)
-% hold on
-% 
-% xlabel('a*')
-% ylabel('b*')
-% zlabel('L*')
-% 
-% LABm = squeeze(median(LAB,3));
-% 
-% for j=1:size(LAB,4)   
-%     p3(j) = plot3(LABm(2,:,j),LABm(3,:,j),LABm(1,:,j),'o-',...
-%         'Color',cols(j,:),'DisplayName',files(j).name(1:5));    
-% end
-% 
-% view(2)
-% legend('Location','westoutside')
-% 
-% s2 = subplot(2,2,3);
-% xlabel('a*')
-% ylabel('b*')
-% zlabel('L*')
-% copyobj(p3,s2);
-% view(0,0)
-% 
-% s3 = subplot(2,2,4);
-% xlabel('a*')
-% ylabel('b*')
-% zlabel('L*')
-% copyobj(p3,s3);
-% view(90,0)
-% 
-% 
-% %% Select Lstar
-% subplot(2,2,2)
-% hold on
-% 
-% %ltns_all = 85:-5:10;
-% %ltns = [16,9,1]; %lightnesses
-% ltns = [14,6]; %lightnesses
-% ltnscols = [0,0,0; 0.5,0.5,0.5;0.7,0.7,0.7];
-% linestyle = {'-','--',':'};
-% 
-% for lI = 1:length(ltns) %lightness Index
-%      p(lI) = plot3(squeeze(LABm(2,ltns(lI),:)),squeeze(LABm(3,ltns(lI),:)),squeeze(LABm(1,ltns(lI),:)),...
-%          'Color',ltnscols(lI,:),'LineStyle',linestyle{lI});
-%     for j=1:size(LAB,4)
-%         scatter3(LABm(2,ltns(lI),j),LABm(3,ltns(lI),j),LABm(1,ltns(lI),j),...
-%             [],cols(j,:),'filled')
-%     end
-% end
-% 
-% %legend(p,split(num2str(ltns_all(ltns)))) %programmatically
-% %legend(p,{'10 L*','45 L*','85 L*'},'Location','best')
-% legend(p,{'20 L*','60 L*'},'Location','best')
-% view(2)
-% xlabel('a*')
-% ylabel('b*')
-% zlabel('L*')
-
-%save2pdf([data_folder(1:end-17),'Data Analysis\figs\',obs,'dataOverview'])
+save2pdf([data_folder(1:end-17),'Data Analysis\figs\',obs,'dataOverview'])
 
 %%
 
@@ -349,7 +353,7 @@ zlabel('Y')
 %         end
 %     end
 % end
-% 
+%
 % figure, imagesc(mean(pValue,3))
 % colorbar
 
