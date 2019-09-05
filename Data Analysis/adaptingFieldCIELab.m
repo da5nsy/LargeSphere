@@ -15,11 +15,12 @@ DGdisplaydefaults;
 %% Load sphere measurements
 
 load('C:\Users\cege-user\Dropbox\UCL\Data\LargeSphere\Hardware Data\Filter spectra\Illumination in sphere.mat','spectra','lambda')
-S_spectra = MakeItS([380:4:780]'); clear lambda
+lambda = double(lambda);
+S_spectra = MakeItS(lambda); clear lambda
 spectra = spectra(:,2:17);
 
-%load('C:\Users\cege-user\Dropbox\UCL\Data\LargeSphere\Hardware Data\Calibration Data\LCD display measurement.mat')
-load('C:\Users\cege-user\Dropbox\UCL\Data\LargeSphere\Hardware Data\Calibration Data\Large LCD display measurement.mat','Measurement')
+%load('C:\Users\cege-user\Dropbox\UCL\Data\LargeSphere\Hardware Data\Calibration Data\LCD display measurement.mat','Measurement') %LM
+load('C:\Users\cege-user\Dropbox\UCL\Data\LargeSphere\Hardware Data\Calibration Data\Large LCD display measurement.mat','Measurement') %TR
 screen_spectra = Measurement(:,21,4);
 clear Measurement
 %% Load observer
@@ -32,7 +33,9 @@ T_xyz1931 = SplineCmf(S_xyz1931,T_xyz1931,S_spectra);
 XYZ = T_xyz1931 * spectra;
 %Lab = XYZToLab(XYZ, [94.97,100,98.15]');
 XYZ_screen = T_xyz1931 * screen_spectra;
-Lab = XYZToLab(XYZ, XYZ_screen);
+XYZ_screenN = XYZ_screen/XYZ_screen(2)*100; %normalised
+XYZN = XYZ/XYZ_screen(2)*100; %normalised, using the same factor as above
+Lab = XYZToLab(XYZN, XYZ_screenN);
 
 %% Plot
 
@@ -87,7 +90,7 @@ view(90,0)
 
 %%
 
-save('adaptingFieldCIELabTR','Lab')
+save('C:\Users\cege-user\Dropbox\UCL\Data\LargeSphere\Data Analysis\adaptingFieldCIELabTR','Lab')
 
 
 

@@ -444,16 +444,16 @@ for j=1:size(LAB,4)
     p3(j) = plot3(LABm(2,:,j),LABm(3,:,j),LABm(1,:,j),'o-',...
         'Color',cols(j,:),'DisplayName',files(j).name(1:5));
 end
-legend('Location','westoutside')
+%legend('Location','westoutside')
 
-% for lI = 1:length(ltns) %lightness Index
-%     p(lI) = plot3(squeeze(LABm(2,ltns(lI),:)),squeeze(LABm(3,ltns(lI),:)),squeeze(LABm(1,ltns(lI),:)),...
-%         'Color',ltnscols(lI,:),'LineStyle',linestyle{lI});
-%     for j=1:size(LAB,4)
-%         scatter3(LABm(2,ltns(lI),j),LABm(3,ltns(lI),j),LABm(1,ltns(lI),j),...
-%             [],cols(j,:),'filled')
-%     end
-% end
+for lI = 1:length(ltns) %lightness Index
+    p(lI) = plot3(squeeze(LABm(2,ltns(lI),:)),squeeze(LABm(3,ltns(lI),:)),squeeze(LABm(1,ltns(lI),:)),...
+        'Color',ltnscols(lI,:),'LineStyle',linestyle{lI});
+    for j=1:size(LAB,4)
+        scatter3(LABm(2,ltns(lI),j),LABm(3,ltns(lI),j),LABm(1,ltns(lI),j),...
+            [],cols(j,:),'filled')
+    end
+end
 
 % save2pdf([data_folder(1:end-17),'Data Analysis\figs\',obs,'compareWithSurround'])
 
