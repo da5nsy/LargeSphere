@@ -10,12 +10,7 @@
 clear, clc, close all
 
 % figure defaults
-set(groot,'defaultfigureposition',[100 100 500 400]);
-set(groot,'defaultLineLineWidth',2);
-set(groot,'defaultAxesFontName', 'Courier');
-set(groot,'defaultAxesFontSize',12);
-set(groot,'defaultFigureRenderer', 'painters') %renders pdfs as vectors
-set(groot,'defaultfigurecolor','white')
+DGdisplaydefaults;
 
 %% Load sphere measurements
 
@@ -23,6 +18,7 @@ load('C:\Users\cege-user\Dropbox\UCL\Data\LargeSphere\Hardware Data\Filter spect
 S_spectra = MakeItS([380:4:780]'); clear lambda
 spectra = spectra(:,2:17);
 
+%load('C:\Users\cege-user\Dropbox\UCL\Data\LargeSphere\Hardware Data\Calibration Data\LCD display measurement.mat')
 load('C:\Users\cege-user\Dropbox\UCL\Data\LargeSphere\Hardware Data\Calibration Data\Large LCD display measurement.mat','Measurement')
 screen_spectra = Measurement(:,21,4);
 clear Measurement
@@ -41,10 +37,13 @@ Lab = XYZToLab(XYZ, XYZ_screen);
 %% Plot
 
 cols = jet(16);
+% cols = XYZToSRGBPrimary(XYZ/max(XYZ(:)))';
+% cols(cols>1) = 1;
+% cols(cols<0) = 0;
 adap = 400:20:700;
 
 figure, hold on
-plot3(Lab(2,:),Lab(3,:),Lab(1,:),'k')
+plot3(Lab(2,:),Lab(3,:),Lab(1,:),'k','HandleVisibility','off')
 for i = 1:16
     scatter3(Lab(2,i),Lab(3,i),Lab(1,i),[],cols(i,:),'filled','DisplayName',num2str(adap(i)))
 end
@@ -54,8 +53,11 @@ ylabel('b*')
 zlabel('L*')
 view(2)
 
-save2pdf('C:\Users\cege-user\Dropbox\UCL\Data\LargeSphere\Data Analysis\figs\adapter1.pdf')
+legend('Location','bestoutside')
 
+%save2pdf('C:\Users\cege-user\Dropbox\UCL\Data\LargeSphere\Data Analysis\figs\adapter1.pdf')
+
+%%
 figure, hold on
 subplot(1,2,1), hold on
 plot3(Lab(2,:),Lab(3,:),Lab(1,:),'k')
@@ -81,10 +83,12 @@ zticks([])
 %cleanTicks
 view(90,0)
 
-save2pdf('C:\Users\cege-user\Dropbox\UCL\Data\LargeSphere\Data Analysis\figs\adapter2.pdf')
+%save2pdf('C:\Users\cege-user\Dropbox\UCL\Data\LargeSphere\Data Analysis\figs\adapter2.pdf')
 
+%%
 
-%legend('Location','bestoutside')
+save('adaptingFieldCIELabTR','Lab')
+
 
 
 

@@ -9,11 +9,12 @@ DGdisplaydefaults;
 
 if ~exist('obs','var')
     clear, clc, close all
-    obs = 'baseline';
+    obs = 'LM';
 end
 
 cs = 'LAB'; %colour space, for plotting
 cols = jet(16);
+%load cols cols
 bcol = lines(9);
 
 %% Load Data
@@ -250,8 +251,8 @@ if strcmp(cs,'xyY')
     %ltns_all = 85:-5:10;
     %ltns = [16,9,1]; %lightnesses
     ltns = [14,6]; %lightnesses
-    ltnscols = [0,0,0; 0.5,0.5,0.5;0.7,0.7,0.7];
-    linestyle = {'-','--',':'};
+    ltnscols = [0.5,0.5,0.5;0.7,0.7,0.7;0,0,0];
+    linestyle = {'--',':','-'};
     
     for lI = 1:length(ltns) %lightness Index
         p(lI) = plot3(squeeze(xyYm(1,ltns(lI),:)),squeeze(xyYm(2,ltns(lI),:)),squeeze(xyYm(3,ltns(lI),:)),...
@@ -342,32 +343,32 @@ elseif strcmp(cs,'LAB')
     %ltns_all = 85:-5:10;
     %ltns = [16,9,1]; %lightnesses
     ltns = [14,6]; %lightnesses
-    ltnscols = [0,0,0; 0.5,0.5,0.5;0.7,0.7,0.7];
-    linestyle = {'-','--',':'};
+    ltnscols = [0.5,0.5,0.5;0.7,0.7,0.7;0,0,0];
+    linestyle = {'--',':','-'};
     
     for lI = 1:length(ltns) %lightness Index
         if strcmp(obs,'baseline')
-%             lI = 2;
-%             for j = [t,t(1)] %repeat initial (central)
-%                 for i = [-2,-1,1,2]
-%                     p(lI) = plot3([LABm(2,ltns(lI),j),LABm(2,ltns(lI),j+i)],[LABm(3,ltns(lI),j),LABm(3,ltns(lI),j+i)],[LABm(1,ltns(lI),j),LABm(1,ltns(lI),j+i)],...
-%                         'Color',ltnscols(lI,:),'LineStyle',linestyle{lI});
-%                 end
-%             end
-%             legend(p,{'20 L*','60 L*'},'Location','best')
-%             xlim([-100 100])
-%             ylim([-100 100])
-%             zlim([0 100])
-%             axis equal
-%             cleanTicks
-%             for j=1:size(LAB,4)
-%                 scatter3(LABm(2,ltns(lI),j),LABm(3,ltns(lI),j),LABm(1,ltns(lI),j),...
-%                     [],bcol(ceil(j/5),:),'filled')
-%             end
-%             view(2)
-%             xlabel('a*')
-%             ylabel('b*')
-%             zlabel('L*')
+            %             lI = 2;
+            %             for j = [t,t(1)] %repeat initial (central)
+            %                 for i = [-2,-1,1,2]
+            %                     p(lI) = plot3([LABm(2,ltns(lI),j),LABm(2,ltns(lI),j+i)],[LABm(3,ltns(lI),j),LABm(3,ltns(lI),j+i)],[LABm(1,ltns(lI),j),LABm(1,ltns(lI),j+i)],...
+            %                         'Color',ltnscols(lI,:),'LineStyle',linestyle{lI});
+            %                 end
+            %             end
+            %             legend(p,{'20 L*','60 L*'},'Location','best')
+            %             xlim([-100 100])
+            %             ylim([-100 100])
+            %             zlim([0 100])
+            %             axis equal
+            %             cleanTicks
+            %             for j=1:size(LAB,4)
+            %                 scatter3(LABm(2,ltns(lI),j),LABm(3,ltns(lI),j),LABm(1,ltns(lI),j),...
+            %                     [],bcol(ceil(j/5),:),'filled')
+            %             end
+            %             view(2)
+            %             xlabel('a*')
+            %             ylabel('b*')
+            %             zlabel('L*')
         else
             p(lI) = plot3(squeeze(LABm(2,ltns(lI),:)),squeeze(LABm(3,ltns(lI),:)),squeeze(LABm(1,ltns(lI),:)),...
                 'Color',ltnscols(lI,:),'LineStyle',linestyle{lI});
@@ -386,7 +387,76 @@ elseif strcmp(cs,'LAB')
     end
 end
 
-save2pdf([data_folder(1:end-17),'Data Analysis\figs\',obs,'dataOverview'])
+%save2pdf([data_folder(1:end-17),'Data Analysis\figs\',obs,'dataOverview'])
+
+%%
+
+figure('Position',[100 100 500 800])
+hold on
+
+for i = 1:3    
+    subplot(3,1,i)
+    imagesc(squeeze(median(LAB(i,6:end,:,:),2)))
+    %imagesc(squeeze(LAB(i,6,:,:)))
+    axis image
+    
+    yticks(1:10)
+    
+    ylabel('Repeat #')
+    colormap('gray')
+    colorbar
+    
+    if i == 3
+        xticks(1:16)
+    xticklabels(400:20:700)
+    xtickangle(90)
+    xlabel('Wavelength (nm)')
+    else
+        xticks('')
+    end
+    set(gca,'YDir','normal')
+end
+
+%save2pdf([data_folder(1:end-17),'Data Analysis\figs\',obs,'dataOverTime'])
+
+%%
+if strcmp(obs,'LM')
+    load adaptingFieldCIELabLM.mat Lab
+elseif strcmp(obs,'TR')
+    load adaptingFieldCIELabTR.mat Lab
+else
+    error('I haven''t made a set of surround CIELAB values for that observer')
+end
+adap = 400:20:700;
+
+figure, hold on
+
+plot3(Lab(2,:),Lab(3,:),Lab(1,:),'k')
+for i = 1:16
+    scatter3(Lab(2,i),Lab(3,i),Lab(1,i),[],cols(i,:),'filled','DisplayName',num2str(adap(i)))
+end
+grid off
+xlabel('a*')
+ylabel('b*')
+zlabel('L*')
+
+for j=1:size(LAB,4)
+    p3(j) = plot3(LABm(2,:,j),LABm(3,:,j),LABm(1,:,j),'o-',...
+        'Color',cols(j,:),'DisplayName',files(j).name(1:5));
+end
+legend('Location','westoutside')
+
+% for lI = 1:length(ltns) %lightness Index
+%     p(lI) = plot3(squeeze(LABm(2,ltns(lI),:)),squeeze(LABm(3,ltns(lI),:)),squeeze(LABm(1,ltns(lI),:)),...
+%         'Color',ltnscols(lI,:),'LineStyle',linestyle{lI});
+%     for j=1:size(LAB,4)
+%         scatter3(LABm(2,ltns(lI),j),LABm(3,ltns(lI),j),LABm(1,ltns(lI),j),...
+%             [],cols(j,:),'filled')
+%     end
+% end
+
+% save2pdf([data_folder(1:end-17),'Data Analysis\figs\',obs,'compareWithSurround'])
+
 
 %%
 
