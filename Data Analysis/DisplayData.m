@@ -440,10 +440,10 @@ xlabel('a*')
 ylabel('b*')
 zlabel('L*')
 
-for j=1:size(LAB,4)
-    p3(j) = plot3(LABm(2,:,j),LABm(3,:,j),LABm(1,:,j),'o-',...
-        'Color',cols(j,:),'DisplayName',files(j).name(1:5));
-end
+% for j=1:size(LAB,4)
+%     p3(j) = plot3(LABm(2,:,j),LABm(3,:,j),LABm(1,:,j),'o-',...
+%         'Color',cols(j,:),'DisplayName',files(j).name(1:5));
+% end
 %legend('Location','westoutside')
 
 for lI = 1:length(ltns) %lightness Index
@@ -455,7 +455,7 @@ for lI = 1:length(ltns) %lightness Index
     end
 end
 
-% save2pdf([data_folder(1:end-17),'Data Analysis\figs\',obs,'compareWithSurround'])
+ save2pdf([data_folder(1:end-17),'Data Analysis\figs\',obs,'compareWithSurround'])
 
 
 %%
