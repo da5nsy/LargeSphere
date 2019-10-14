@@ -3,6 +3,8 @@
 %
 %  Analyse experimental results for one wavelength and plot figures
 %
+% (LM analysis)
+%
 %-------------------------------------------------------------------------
 
 clear, clc, close all

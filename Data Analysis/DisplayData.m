@@ -84,10 +84,10 @@ end
 load(dfile,'sval','XYZ')
 
 %interpolate recorded values (sval) to required vals (0:1:255)
-XYZinterp=zeros(3,256,4);
+XYZinterp = zeros(3,256,4);
 % figure, hold on
-for i=1:3
-    for j=1:4
+for i = 1:3
+    for j = 1:4
         XYZinterp(i,:,j) = interp1(sval, XYZ(i,:,j), 0:255, 'spline');
         %         plot(sval, XYZ(i,:,j),'o')        % check interpolation
         %         plot(0:255, XYZinterp(i,:,j))
@@ -144,7 +144,7 @@ end
 
 % % Plot display white points
 figure, hold on
-drawChromaticity
+DrawChromaticity
 scatter(XYZw(1)/sum(XYZw),XYZw(2)/sum(XYZw),'k')
 
 %% Grab LABcal values out for easier plotting
@@ -167,7 +167,7 @@ if strcmp(cs,'LAB')
     
 elseif strcmp(cs,'xyY')
     figure, hold on
-    drawChromaticity
+    DrawChromaticity
     scatter3(xyY(1,:),xyY(2,:),xyY(3,:),'.') %how would I add colour to this?
     
     xlabel('x')
@@ -190,7 +190,7 @@ if strcmp(cs,'LAB')
         end
     end
 elseif strcmp(cs,'xyY')
-    drawChromaticity
+    DrawChromaticity
     daspect([1,1,150])
     for j = 1:size(xyY,4)
         for i = 1:size(xyY,3)
