@@ -459,21 +459,23 @@ end
 
 %% Colour Constancy Indices
 
-CCIa = zeros(size(LAB,2),size(LAB,3),size(LAB,4)); % distance - test patch to ideal match
-CCIb = zeros(size(CCIa)); % distance - ideal match to observer match
+CCIa = zeros(size(LAB,2),size(LAB,3),size(LAB,4)); % distance - pre-adapt to ideal match
+CCIb = zeros(size(CCIa)); % distance - ideal match to post-adapt
+CCIc = zeros(size(CCIa)); % distance - pre-adapt to post-adapt
 CCI = zeros(size(CCIa));
 %WP = [0,0];
 WP = [mean(LAB(2,:)),mean(LAB(3,:))];
 
-% test patch = [0,0], objective white
-% ideal match = Lab, the surround aka adapting illuminant
-% observer match = LAB, the matches made by observers
+% pre-adapt     = WP as above, either: [0,0] (objective white), or average response for observer
+% ideal match   = Lab, the surround aka adapting illuminant
+% post-adapt    = LAB, the matches made by observers
 
 for i = 1:size(CCIa,1)
     for j = 1:size(CCIa,2)
         for k = 1:size(CCIa,3)
             CCIa(i,j,k) = sqrt((WP(1)-Lab(2,k))^2+(WP(2)-Lab(3,k))^2);
-            CCIb(i,j,k) = sqrt((Lab(2,k)-LAB(2,i,j,k))^2+(Lab(3,k)-LAB(2,i,j,k))^2);
+            CCIb(i,j,k) = sqrt((Lab(2,k)-LAB(2,i,j,k))^2+(Lab(3,k)-LAB(3,i,j,k))^2);
+            CCIc(i,j,k) = sqrt((WP(1)-LAB(2,i,j,k))^2+(WP(2)-LAB(3,i,j,k))^2);
             CCI(i,j,k) = 1 - CCIb(i,j,k) / CCIa(i,j,k);
         end
     end
@@ -493,6 +495,30 @@ xlabel('Adapting Wavelength (nm)')
 ylabel('Colour Constancy Index')
 
 %save2pdf([data_folder(1:end-17),'Data Analysis\figs\',obs,'CCI'])
+
+%% Adaptation vector over L*
+
+figure, hold on
+
+plot(10:5:85,flip(mean(mean(CCIc,3),2)),'k')
+axis tight
+
+xlabel('L*')
+ylabel('Distance, pre-adapt:post-adapt')
+
+save2pdf([data_folder(1:end-17),'Data Analysis\figs\',obs,'CCI_L'])
+
+%% Adaptation vector over time
+
+figure, hold on
+
+plot(1:10,mean(mean(CCIc,3),1),'k')
+axis tight
+
+xlabel('Repeat number, over time')
+ylabel('Distance, pre-adapt:post-adapt')
+
+save2pdf([data_folder(1:end-17),'Data Analysis\figs\',obs,'CCI_T'])
 
 
 %%
