@@ -482,10 +482,11 @@ for i = 1:size(CCIa,1)
 end
 
 CCI_moT = squeeze(mean(CCI,2)); %CCI, mean over time
+CCI_SDoT = squeeze(std(CCI,[],2));
 
 figure, hold on
 for lI = 1:length(ltns) %lightness Index
-    plot(400:20:700,CCI_moT(lI,:),'-o')
+    errorbar(400:20:700,CCI_moT(lI,:),CCI_SDoT(lI,:),'LineWidth',1.5)
 end
 %plot(CCI_moT')
 %plot(squeeze(CCI(10,5,:)))
@@ -494,13 +495,16 @@ legend('20 L*','60 L*','Location','best')
 xlabel('Adapting Wavelength (nm)')
 ylabel('Colour Constancy Index')
 
-%save2pdf([data_folder(1:end-17),'Data Analysis\figs\',obs,'CCI'])
+save2pdf([data_folder(1:end-17),'Data Analysis\figs\',obs,'CCI'])
 
 %% Adaptation vector over L*
 
 figure, hold on
 
-plot(10:5:85,flip(mean(mean(CCIc,3),2)),'k')
+avol    = flip(mean(mean(CCIc,3),2));
+avol_sd = flip(std(reshape(CCIc,16,[]),[],2));
+
+errorbar(10:5:85,avol,avol_sd,'k','LineWidth',1.5)
 axis tight
 
 xlabel('L*')
@@ -512,7 +516,10 @@ save2pdf([data_folder(1:end-17),'Data Analysis\figs\',obs,'CCI_L'])
 
 figure, hold on
 
-plot(1:10,mean(mean(CCIc,3),1),'k')
+avot    = mean(mean(CCIc,3),1);
+avot_sd = std(reshape(permute(CCIc,[2,1,3]),10,[]),[],2);
+
+errorbar(1:10,avot,avot_sd,'k','LineWidth',1.5)
 axis tight
 
 xlabel('Repeat number, over time')
