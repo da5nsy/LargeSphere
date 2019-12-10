@@ -495,7 +495,7 @@ legend('20 L*','60 L*','Location','best')
 xlabel('Adapting Wavelength (nm)')
 ylabel('Colour Constancy Index')
 
-save2pdf([data_folder(1:end-17),'Data Analysis\figs\',obs,'CCI'])
+%save2pdf([data_folder(1:end-17),'Data Analysis\figs\',obs,'CCI'])
 
 %% Adaptation vector over L*
 
@@ -510,7 +510,7 @@ axis tight
 xlabel('L*')
 ylabel('Distance, pre-adapt:post-adapt')
 
-save2pdf([data_folder(1:end-17),'Data Analysis\figs\',obs,'CCI_L'])
+%save2pdf([data_folder(1:end-17),'Data Analysis\figs\',obs,'CCI_L'])
 
 %% Adaptation vector over time
 
@@ -525,7 +525,24 @@ axis tight
 xlabel('Repeat number, over time')
 ylabel('Distance, pre-adapt:post-adapt')
 
-save2pdf([data_folder(1:end-17),'Data Analysis\figs\',obs,'CCI_T'])
+%save2pdf([data_folder(1:end-17),'Data Analysis\figs\',obs,'CCI_T'])
+
+%% n-way anova
+
+anova_y  = CCIc(:);
+
+anova_g1 = repmat((400:20:700)',[1,10,16]); %wavelength
+anova_g1 = anova_g1(:);
+
+anova_g2 = repmat(1:10,[16,1,16]); %time (repeat n)
+anova_g2 = anova_g2(:);
+
+anova_g3 = permute(repmat((85:-5:10)',[1,10,16]),[3,2,1]); %L*
+anova_g3 = anova_g3(:);
+
+[p,tbl,stats] = anovan(anova_y,{anova_g1,anova_g2,anova_g3});
+
+%writecell(tbl)
 
 
 %%
